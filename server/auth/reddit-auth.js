@@ -32,7 +32,7 @@ const RedditAuth = (passport) => {
             redditId: profile.id,
             iconURL: profile.icon_img,
             moderator: isUserModerator,
-            created: Date.new(profile.created),
+            created: Date.now(profile.created),
           }).save();
           done(null, user);
         } catch (err) {

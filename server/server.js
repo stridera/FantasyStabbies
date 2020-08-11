@@ -10,6 +10,8 @@ const authMiddleware = require("./modules/auth-middleware");
 const mongoose = require("mongoose"); // DB
 
 mongoose.connect("mongodb://localhost:27017/fantasy", {
+  user: process.env.DB_USER,
+  pass: process.env.DB_PASS,
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
