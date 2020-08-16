@@ -6,7 +6,6 @@ const app = express();
 const session = require("express-session"); // Need to store state var for reddit auth
 const bodyParser = require("body-parser"); // For parsing body
 const passport = require("passport");
-const authMiddleware = require("./modules/auth-middleware");
 const mongoose = require("mongoose"); // DB
 
 mongoose.connect("mongodb://localhost:27017/fantasy", {
@@ -29,8 +28,6 @@ app.use(
 // Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// app.use(authMiddleware);
 
 // Setup Passport Sessions
 require("./auth/reddit-auth")(passport);

@@ -1,16 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import * as authService from "../services/auth.service";
 
 const authSlice = createSlice({
   name: "auth",
+
   initialState: {
-    token: localStorage.getItem("token"),
     isAuthenticated: null,
+    username: null,
+    userID: null,
+    redditID: null,
     isModerator: null,
-    loading: true,
-    user: null,
+    created: null,
+    loading: false,
     error: null,
   },
+
   reducers: {
     authRequested: (auth, action) => {
       auth.loading = true;
@@ -18,8 +22,11 @@ const authSlice = createSlice({
     },
     authReceived: (auth, action) => {
       auth.isAuthenticated = true;
+      auth.userID = action.payload._id;
+      auth.username = action.payload.username;
       auth.isModerator = action.payload.moderator || false;
-      auth.user = action.payload;
+      auth.redditID = action.payload.redditId;
+      auth.created = action.payload.created;
       auth.loading = false;
     },
     authFailed: (auth, action) => {
@@ -29,11 +36,8 @@ const authSlice = createSlice({
       auth.error = action.payload;
     },
     loggedOut: (auth, action) => {
-      auth.isAuthenticated = false;
-      auth.isModerator = false;
-      auth.user = undefined;
-      auth.error = null;
-      auth.loading = false;
+      console.log("Auth is now undefined.");
+      auth = undefined;
     },
   },
 });
@@ -44,14 +48,13 @@ const { authRequested, authReceived, authFailed, loggedOut } = authSlice.actions
 export const loadUser = () => async (dispatch) => {
   try {
     dispatch({ type: authRequested.type });
-    const res = await axios.get("/api/user");
+    const res = await authService.login();
 
     dispatch({
       type: authReceived.type,
       payload: res.data,
     });
   } catch (err) {
-    console.log("error", err.error);
     const data = err.response.data;
     dispatch({
       type: authFailed.type,
@@ -61,7 +64,7 @@ export const loadUser = () => async (dispatch) => {
 };
 
 // Logout / Clear Profile
-export const logout = () => (dispatch) => {
+export const logout = () => async (dispatch) => {
   dispatch({ type: loggedOut.type });
 };
 

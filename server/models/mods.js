@@ -7,9 +7,7 @@ const cache = new CacheService(ttl); // Create a new cache service instance
 const isMod = async (username) => {
   try {
     const mods = await cache.get("reddit_mods", async () => {
-      const response = await axios.get(
-        "https://www.reddit.com/r/fantasy/about/moderators.json"
-      );
+      const response = await axios.get("https://www.reddit.com/r/fantasy/about/moderators.json");
 
       if (response) {
         return response.data.data.children.map((val) => {
@@ -22,7 +20,7 @@ const isMod = async (username) => {
 
     return mods.includes(username);
   } catch (err) {
-    console.log(err);
+    console.log("isMod error:", err);
     return [];
   }
 };

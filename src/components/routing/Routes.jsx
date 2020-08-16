@@ -1,28 +1,36 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-import Navbar from "../layout/Navbar.jsx";
+import ModRoute from "./ModRoute";
+import ProtectedRoute from "./ProtectedRoute";
+
+import Drawer from "../layout/DrawerLayout";
 import NotFound from "../layout/NotFound";
-import PrivateRoute from "./PrivateRoute";
 
-// import Alert from "../layout/Alert";
-import Help from "../Pages/Help";
 import Mod from "../Pages/Mod";
 import Vote from "../Pages/Vote";
+import Profile from "../Pages/Profile";
+import Auth, { AfterAuth } from "../Pages/Auth";
 
 const Routes = () => {
-  return (
-    <section className="container">
-      <Navbar />
+  const auth = useSelector((state) => state.auth);
 
-      {/* <Alert /> */}
-      <Switch>
-        <Route exact path="/help" component={Help} />
-        <PrivateRoute exact path="/mod" component={Mod} />
-        <PrivateRoute exact path="/vote" component={Vote} />
-        <Route component={NotFound} />
-      </Switch>
-    </section>
+  return (
+    <Switch>
+      <Route exact path="/" component={Auth} />
+      <Route exact path="/after_auth" component={AfterAuth} />
+      <Route exact path="/logout">
+        <Redirect to="/auth/logout" />
+      </Route>
+
+      <ModRoute exact path="/mod" auth={auth} layout={Drawer} title="Moderators" component={Mod} />
+      <ProtectedRoute exact path="/vote" auth={auth} layout={Drawer} title="Vote" component={Vote} />
+      <ProtectedRoute exact path="/vote/:id" auth={auth} layout={Drawer} title="Vote" component={Vote} />
+
+      <ProtectedRoute exact path="/profile" auth={auth} layout={Drawer} title="Profile" component={Profile} />
+      <NotFound />
+    </Switch>
   );
 };
 

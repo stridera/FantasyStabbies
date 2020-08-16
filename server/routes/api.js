@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { ensureAuthenticated } = require("../modules/auth-middleware");
+const { ensureAuthenticated } = require("../middleware/auth.middleware");
 
 const userRouter = require("./api/user");
 router.use("/user", ensureAuthenticated, userRouter);
