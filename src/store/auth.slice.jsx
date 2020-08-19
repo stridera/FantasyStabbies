@@ -1,5 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as authService from "../services/auth.service";
+
+export const login = createAsyncThunk("auth/login", async (unused, { rejectWithValue }) => {
+  const response = await authService.login();
+  return response.data;
+});
+
+export const logout = createAsyncThunk("auth/logOut", async () => {
+  const response = await authService.logout();
+  return response.data;
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -12,15 +22,13 @@ const authSlice = createSlice({
     isModerator: null,
     created: null,
     loading: false,
-    error: null,
   },
-
-  reducers: {
-    authRequested: (auth, action) => {
+  reducers: {},
+  extraReducers: {
+    [login.pending]: (auth, action) => {
       auth.loading = true;
-      auth.error = null;
     },
-    authReceived: (auth, action) => {
+    [login.fulfilled]: (auth, action) => {
       auth.isAuthenticated = true;
       auth.userID = action.payload._id;
       auth.username = action.payload.username;
@@ -29,43 +37,23 @@ const authSlice = createSlice({
       auth.created = action.payload.created;
       auth.loading = false;
     },
-    authFailed: (auth, action) => {
+    [login.rejected]: (auth, action) => {
       auth.loading = false;
       auth.isModerator = false;
       auth.isAuthenticated = false;
-      auth.error = action.payload;
+      auth.error = action.error;
     },
-    loggedOut: (auth, action) => {
-      console.log("Auth is now undefined.");
-      auth = undefined;
+
+    [logout.fulfilled]: (auth, action) => {
+      auth.isAuthenticated = null;
+      auth.username = null;
+      auth.userID = null;
+      auth.redditID = null;
+      auth.isModerator = null;
+      auth.created = null;
+      auth.loading = false;
     },
   },
 });
-
-const { authRequested, authReceived, authFailed, loggedOut } = authSlice.actions;
-
-// Load User
-export const loadUser = () => async (dispatch) => {
-  try {
-    dispatch({ type: authRequested.type });
-    const res = await authService.login();
-
-    dispatch({
-      type: authReceived.type,
-      payload: res.data,
-    });
-  } catch (err) {
-    const data = err.response.data;
-    dispatch({
-      type: authFailed.type,
-      payload: data.error ? data.error.message : data.message,
-    });
-  }
-};
-
-// Logout / Clear Profile
-export const logout = () => async (dispatch) => {
-  dispatch({ type: loggedOut.type });
-};
 
 export default authSlice.reducer;

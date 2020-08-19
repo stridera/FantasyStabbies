@@ -1,0 +1,13 @@
+ENV = dev
+
+MONGOOSE_URL = "mongodb://localhost:27017/fantasy"
+MONGOOSE_USER = fantasy
+MONGOOSE_PASS = password
+
+REDDIT_CONSUMER_KEY = ABCD12345
+REDDIT_CONSUMER_SECRET = SECRET_KEY
+REDDIT_CALLBACK_URL = http://127.0.0.1:3000/auth/reddit/callback
+
+DEV_TOKEN = DEV_TOKEN
+
+BROWSER = none

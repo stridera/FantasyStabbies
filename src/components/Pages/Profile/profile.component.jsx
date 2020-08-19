@@ -1,7 +1,9 @@
 import React from "react";
 import DrawerLayout from "../../layout/DrawerLayout";
 
-const Profile = () => {
+const Profile = ({ setTitle }) => {
+  setTitle("Moderator");
+
   return (
     <DrawerLayout title="Profile">
       <h1>Profile</h1>

@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers";
-import moment from "moment";
-import * as yup from "yup";
 import slugify from "slugify";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -22,7 +20,8 @@ import {
 import { Add as AddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
 import { useSelector, useDispatch } from "react-redux";
-import { createCampaign } from "../../store/campaigns.slice";
+import { createCampaign } from "../../store/entities/campaigns.slice";
+import { campaignSchema } from "../../config/validation.schema";
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -38,52 +37,42 @@ const CampaignDialog = ({ open, onClose }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const handleClose = () => {
-    onClose();
-  };
-
-  const schema = yup.object().shape({
-    campaignName: yup.string().required().min(3),
-    slug: yup.string().required().min(3),
-    min_age: yup.number().positive().integer().required(),
-    nominateStart: yup.date().required().min(moment().subtract(1, "days"), "Dates must be later than today."),
-    voteStart: yup.date().required().min(yup.ref("nominateStart"), "Vote start must be after nomination start date."),
-    endDate: yup.date().required().min(yup.ref("nominateStart"), "Vote start must be after nomination start date."),
-  });
-
   const { register, handleSubmit, setValue, errors } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(campaignSchema),
   });
-
-  const onSubmit = (data) => {
-    dispatch(
-      createCampaign(
-        data.campaignName,
-        data.public,
-        data.nominationStartDate,
-        data.votingStartDate,
-        data.endDate,
-        data.ageRequirement
-      )
-    );
-  };
 
   const campaigns = useSelector((state) => state.campaigns);
   const [slugDirty, setSlugDirty] = useState(false);
-
-  useEffect(() => {
-    if (campaigns.modifyError) {
-      showError(true);
-    }
-  }, [campaigns]);
   const [errorShowing, showError] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  const onSubmit = (data) => {
+    setSubmitted(true);
+    dispatch(createCampaign(data));
+  };
+
   const closeError = () => {
     showError(false);
   };
 
+  useEffect(() => {
+    if (submitted) {
+      if (campaigns.modifyError) {
+        showError(true);
+      } else {
+        handleClose();
+      }
+      setSubmitted(false);
+    }
+  }, [campaigns, handleClose, submitted]);
+
   return (
     <Dialog onClose={handleClose} aria-labelledby="-dialog-title" open={open}>
-      <DialogTitle id="-dialog-title"> Campaign</DialogTitle>
+      <DialogTitle id="-dialog-title">Create New Campaign</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
@@ -144,11 +133,11 @@ const CampaignDialog = ({ open, onClose }) => {
                 margin="normal"
                 required
                 fullWidth
-                id="min_age"
-                name="min_age"
+                id="minAge"
+                name="minAge"
                 label="Minimum Account Age (Days)"
-                error={!!errors.min_age}
-                helperText={errors.min_age?.message}
+                error={!!errors.minAge}
+                helperText={errors.minAge?.message}
               />
             </Grid>
             <Grid item sm={4}>

@@ -4,7 +4,6 @@ const usersSchema = mongoose.Schema(
   {
     username: String,
     redditId: String,
-    iconURL: String,
     moderator: Boolean,
     created: Date,
   },

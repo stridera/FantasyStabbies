@@ -8,6 +8,8 @@ import { blueGrey } from "@material-ui/core/colors";
 import store from "./store/store";
 
 import Routes from "./components/routing/Routes";
+import { login } from "./store/auth.slice";
+import { getCampaigns } from "./store/entities/campaigns.slice";
 
 const App = () => {
   const theme = createMuiTheme({
@@ -20,6 +22,9 @@ const App = () => {
       background: { default: "#000" },
     },
   });
+
+  store.dispatch(login());
+  store.dispatch(getCampaigns());
 
   return (
     <Provider store={store}>

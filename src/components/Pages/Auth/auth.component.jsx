@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { useTheme, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router";
 
 import Alert from "../../custom/Alert";
@@ -9,7 +9,6 @@ import { Card, CardHeader, CardContent, Button, CircularProgress } from "@materi
 import { green } from "@material-ui/core/colors";
 
 import Snoo from "./img/fantasy.png";
-import { loadUser } from "../../../store/auth.slice";
 
 const useStyles = makeStyles({
   root: {
@@ -41,25 +40,22 @@ const useStyles = makeStyles({
 
 const Auth = () => {
   const history = useHistory();
-  const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-  const [loading, setLoading] = useState(true);
+  const campaigns = useSelector((state) => state.campaigns);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    dispatch(loadUser());
-    setLoading(true);
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (auth.isAuthenticated) auth.isModerator ? history.push("/mod") : history.push("/vote");
-    setLoading(false);
-  }, [auth, history]);
-
-  const theme = useTheme();
-  const classes = useStyles(theme);
-
   const location = useLocation();
+  useEffect(() => {
+    if (auth.isAuthenticated && campaigns.loaded) {
+      const from = location.state?.from?.pathname;
+      if (from) {
+        history.push(location.state.from.pathname);
+      } else {
+        auth.isModerator ? history.push("/mod") : history.push("/vote");
+      }
+    }
+  }, [auth, history, location.state, campaigns.loaded]);
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const error = searchParams.get("error");
@@ -71,6 +67,9 @@ const Auth = () => {
         case "auth_failed":
           setError("Authorization failed.  Please try again.");
           break;
+        case "signed_out":
+          setError("You've been signed out.  Please sign in again.");
+          break;
         default:
           setError("An error occured.  Please try again.");
           break;
@@ -78,16 +77,17 @@ const Auth = () => {
     }
   }, [location]);
 
+  const classes = useStyles();
   return (
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardHeader className={classes.cardHeader} title="Sign in to vote." />
         <CardContent>
           <img src={Snoo} style={{ width: "200px", margin: "auto", display: "block" }} alt="Loading..." />
-          <Button fullWidth href="/auth/reddit/" variant="contained" color="primary" disabled={loading}>
+          <Button fullWidth href="/auth/reddit/" variant="contained" color="primary" disabled={auth.loading}>
             Login via Reddit
           </Button>
-          {loading && <CircularProgress size={60} className={classes.loadingProgress} />}
+          {auth.loading && <CircularProgress size={60} className={classes.loadingProgress} />}
         </CardContent>
       </Card>
       {error && <Alert severity="error">{error}</Alert>}

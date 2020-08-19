@@ -27,8 +27,10 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "http-proxy-middleware": "^1.0.5",
+    "lodash": "^4.17.20",
     "moment": "^2.24.0",
     "mongoose": "^5.9.27",
+    "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "passport": "^0.4.1",
     "passport-reddit": "^0.2.4",
@@ -42,6 +44,8 @@
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.5",
     "slugify": "^1.4.5",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.0",
     "yup": "^0.29.3"
   },
   "devDependencies": {

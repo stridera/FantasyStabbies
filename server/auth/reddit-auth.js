@@ -1,7 +1,7 @@
 const RedditStrategy = require("passport-reddit").Strategy;
 
-const User = require("../models/user");
-const isMod = require("../models/mods");
+const User = require("../models/user.model");
+const isMod = require("../models/mods.model");
 
 // Use the RedditStrategy within Passport.
 
@@ -11,7 +11,7 @@ const RedditAuth = (passport) => {
       {
         clientID: process.env.REDDIT_CONSUMER_KEY,
         clientSecret: process.env.REDDIT_CONSUMER_SECRET,
-        callbackURL: "http://127.0.0.1:3000/auth/reddit/callback",
+        callbackURL: process.env.REDDIT_CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {

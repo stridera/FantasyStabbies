@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
   AppBar,
@@ -16,17 +17,11 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import {
-  ExitToApp as LogoutIcon,
-  Help as HelpIcon,
-  WhereToVote as VoteIcon,
-  Menu as MenuIcon,
-  AccountCircle,
-} from "@material-ui/icons";
+import { ExitToApp as LogoutIcon, WhereToVote as VoteIcon, Menu as MenuIcon, AccountCircle } from "@material-ui/icons";
 import CampaignDialog from "../dialogs/Campaign.dialog";
 
-import { getCampaigns, allCampaigns } from "../../store/campaigns.slice";
 import { logout } from "../../store/auth.slice";
+import { getCampaigns } from "../../store/entities/campaigns.slice";
 
 const drawerWidth = 240;
 
@@ -53,11 +48,10 @@ const useStyles = makeStyles((theme) => ({
       display: "none",
     },
   },
+  toolbar: theme.mixins.toolbar,
   accountMenuButton: {
     marginRight: theme.spacing(2),
   },
-  // necessary for content to be below app bar
-  toolbar: theme.mixins.toolbar,
   drawerPaper: {
     width: drawerWidth,
   },
@@ -76,14 +70,18 @@ const ResponsiveDrawer = ({ title, children }) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const auth = useSelector((state) => state.auth);
-  const campaigns = useSelector((state) => allCampaigns);
+  const campaigns = useSelector((state) => state.campaigns);
 
-  useEffect(() => {
-    dispatch(getCampaigns());
-  }, [dispatch]);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    if (campaigns.loading) return;
+
+    const minSinceLastUpdate = moment().diff(moment(campaigns.lastUpdate), "minute");
+    if (minSinceLastUpdate > 1) dispatch(getCampaigns());
+  }, [campaigns, dispatch]);
 
   const drawer = (
     <div>
@@ -94,13 +92,13 @@ const ResponsiveDrawer = ({ title, children }) => {
       </div>
       <Divider />
       <List subheader={<ListSubheader>Campaigns</ListSubheader>} className={classes.toolbar_bottom}>
-        {campaigns.length ? (
-          campaigns.map((campaign, index) => (
-            <ListItem button key={campaign.name}>
+        {campaigns.entities.length ? (
+          campaigns.entities.map((campaign, index) => (
+            <ListItem button key={campaign.slug} component={Link} to={`/campaign/${campaign.slug}`}>
               <ListItemIcon>
                 <VoteIcon />
               </ListItemIcon>
-              <ListItemText primary={campaign.name} />
+              <ListItemText primary={campaign.campaignName} />
             </ListItem>
           ))
         ) : (
@@ -121,18 +119,12 @@ const ResponsiveDrawer = ({ title, children }) => {
           </ListItemIcon>
           <ListItemText primary="Profile" />
         </ListItem>
-        <ListItem button component={Link} to="/help" key="help" selected={title === "Help"}>
-          <ListItemIcon>
-            <HelpIcon />
-          </ListItemIcon>
-          <ListItemText primary="Help and Rules" />
-        </ListItem>
         <ListItem
           button
           key="logout"
           onClick={() => {
             dispatch(logout());
-            history.push("/auth/logout");
+            history.push("/");
           }}
         >
           <ListItemIcon>

@@ -1,25 +1,20 @@
 import React from "react";
 
 import AuthComponent from "./auth.component";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { loadUser } from "../../../store/auth.slice";
 import { useHistory } from "react-router";
 
 export const AfterAuth = () => {
   const auth = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(loadUser());
-  }, [dispatch]);
-
-  useEffect(() => {
+    console.log("Checking auth.", auth.isAuthenticated);
     if (auth.isAuthenticated) {
       auth.isModerator ? history.push("/mod") : history.push("/vote");
     }
-  }, [auth, history]);
+  }, [auth.isAuthenticated, auth.isModerator, history]);
 
   return <h1>Logging in...</h1>;
 };

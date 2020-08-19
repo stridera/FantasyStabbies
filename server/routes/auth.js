@@ -5,15 +5,15 @@ router.use("/reddit", reddit);
 
 router.get("/user", (req, res) => {
   if (req.user) {
-    res.send(req.user);
+    return res.send(req.user);
   } else {
-    res.sendStatus(401);
+    return res.status(401).send({ success: false, status: 401, error: "You must authenticate first." });
   }
 });
 
 router.get("/logout", (req, res) => {
   req.logout();
-  res.redirect("/");
+  return res.redirect("/");
 });
 
 module.exports = router;

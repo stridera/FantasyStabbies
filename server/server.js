@@ -5,12 +5,16 @@ const app = express();
 
 const session = require("express-session"); // Need to store state var for reddit auth
 const bodyParser = require("body-parser"); // For parsing body
-const passport = require("passport");
-const mongoose = require("mongoose"); // DB
+const passport = require("passport"); // Reddit/Goodreads Auth
+const mongoose = require("mongoose"); // Database
 
-mongoose.connect("mongodb://localhost:27017/fantasy", {
-  user: process.env.DB_USER,
-  pass: process.env.DB_PASS,
+// Logging Setup
+const morgan = require("morgan");
+var winston = require("./services/winston");
+
+mongoose.connect(process.env.MONGOOSE_URL, {
+  user: process.env.MONGOOSE_USER,
+  pass: process.env.MONGOOSE_PASS,
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
@@ -33,6 +37,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 require("./auth/reddit-auth")(passport);
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Log requests
+app.use(morgan("combined", { stream: winston.stream }));
 
 // Routes
 const authRouter = require("./routes/auth");

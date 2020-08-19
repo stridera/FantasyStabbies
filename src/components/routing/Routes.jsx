@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -9,12 +9,13 @@ import Drawer from "../layout/DrawerLayout";
 import NotFound from "../layout/NotFound";
 
 import Mod from "../Pages/Mod";
-import Vote from "../Pages/Vote";
+import Vote from "../Pages/Campaign";
 import Profile from "../Pages/Profile";
 import Auth, { AfterAuth } from "../Pages/Auth";
 
 const Routes = () => {
   const auth = useSelector((state) => state.auth);
+  const [title, setTitle] = useState("");
 
   return (
     <Switch>
@@ -24,11 +25,25 @@ const Routes = () => {
         <Redirect to="/auth/logout" />
       </Route>
 
-      <ModRoute exact path="/mod" auth={auth} layout={Drawer} title="Moderators" component={Mod} />
-      <ProtectedRoute exact path="/vote" auth={auth} layout={Drawer} title="Vote" component={Vote} />
-      <ProtectedRoute exact path="/vote/:id" auth={auth} layout={Drawer} title="Vote" component={Vote} />
+      <ModRoute exact path="/mod" auth={auth} layout={Drawer} title={title} setTitle={setTitle} component={Mod} />
+      <ProtectedRoute
+        path="/campaign/:slug"
+        auth={auth}
+        layout={Drawer}
+        title={title}
+        setTitle={setTitle}
+        component={Vote}
+      />
 
-      <ProtectedRoute exact path="/profile" auth={auth} layout={Drawer} title="Profile" component={Profile} />
+      <ProtectedRoute
+        exact
+        path="/profile"
+        auth={auth}
+        layout={Drawer}
+        title={title}
+        setTitle={setTitle}
+        component={Profile}
+      />
       <NotFound />
     </Switch>
   );
