@@ -10,7 +10,6 @@ import {
   Box,
   Typography,
   Grid,
-  Button,
   Snackbar,
   Card,
   CardContent,
@@ -60,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Campaign = ({ setTitle, match }) => {
+const CampaignDetailsComponent = ({ setTitle, match }) => {
   const { slug } = match.params;
   const auth = useSelector((state) => state.auth);
   const campaign = useSelector((state) => getCampaignBySlug(slug)(state));
@@ -104,11 +103,9 @@ const Campaign = ({ setTitle, match }) => {
     }
 
     setStatus(`Voting ended ${moment.duration(diff).humanize()} ago.`);
-
-    console.log(diff);
   }, [setStatus, campaign]);
 
-  useEffect(() => {
+  const updateQuestions = useCallback(() => {
     dispatch(getQuestionsForCampaign(campaign._id)).then((data) => {
       if (data.error) {
         if (data.error.message === "Request failed with status code 403") {
@@ -119,6 +116,14 @@ const Campaign = ({ setTitle, match }) => {
       }
     });
   }, [dispatch, campaign._id, history]);
+
+  useEffect(() => {
+    updateQuestions();
+    const interval = setInterval(() => {
+      updateQuestions();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [updateQuestions]);
 
   useEffect(() => {
     setTitle(`Campaign: ${campaign.campaignName}`);
@@ -133,25 +138,6 @@ const Campaign = ({ setTitle, match }) => {
   return (
     <main className={classes.content}>
       <Container maxWidth="lg" className={classes.container}>
-        <Box borderRadius={6} variant="outlined" color="primary" className={classes.modActions}>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <Typography variant="h5" component="h2" align="center">
-                Mod Tools:
-              </Typography>
-            </Grid>
-            <Grid item xs={4}>
-              <Button variant="contained" color="primary" className={classes.button} startIcon={<EditIcon />}>
-                Edit Campaign
-              </Button>
-            </Grid>
-            <Grid item xs={4}>
-              <Button variant="contained" color="secondary" className={classes.button} startIcon={<DeleteIcon />}>
-                Delete Campaign
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
         <Box borderRadius={6} variant="outlined" className={classes.campaignState}>
           <Typography variant="h5" component="h2" align="center">
             {status}
@@ -197,4 +183,4 @@ const Campaign = ({ setTitle, match }) => {
   );
 };
 
-export default Campaign;
+export default CampaignDetailsComponent;

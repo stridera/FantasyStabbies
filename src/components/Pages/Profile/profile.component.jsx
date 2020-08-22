@@ -1,14 +1,11 @@
-import React from "react";
-import DrawerLayout from "../../layout/DrawerLayout";
+import React, { useEffect } from "react";
 
 const Profile = ({ setTitle }) => {
-  setTitle("Moderator");
+  useEffect(() => {
+    setTitle("Profile");
+  }, [setTitle]);
 
-  return (
-    <DrawerLayout title="Profile">
-      <h1>Profile</h1>
-    </DrawerLayout>
-  );
+  return <h1>Profile page will be here... someday.</h1>;
 };
 
 export default Profile;

@@ -22,11 +22,13 @@ const authSlice = createSlice({
     isModerator: null,
     created: null,
     loading: false,
+    loaded: false,
   },
   reducers: {},
   extraReducers: {
     [login.pending]: (auth, action) => {
       auth.loading = true;
+      auth.loaded = false;
     },
     [login.fulfilled]: (auth, action) => {
       auth.isAuthenticated = true;
@@ -36,12 +38,14 @@ const authSlice = createSlice({
       auth.redditID = action.payload.redditId;
       auth.created = action.payload.created;
       auth.loading = false;
+      auth.loaded = true;
     },
     [login.rejected]: (auth, action) => {
       auth.loading = false;
       auth.isModerator = false;
       auth.isAuthenticated = false;
       auth.error = action.error;
+      auth.loaded = true;
     },
 
     [logout.fulfilled]: (auth, action) => {
@@ -52,6 +56,7 @@ const authSlice = createSlice({
       auth.isModerator = null;
       auth.created = null;
       auth.loading = false;
+      auth.loaded = true;
     },
   },
 });

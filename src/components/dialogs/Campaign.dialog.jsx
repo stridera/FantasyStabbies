@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers";
 import slugify from "slugify";
+
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Dialog,
@@ -16,10 +18,12 @@ import {
   Switch,
   FormControlLabel,
   Snackbar,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core";
 import { Add as AddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
-import { useSelector, useDispatch } from "react-redux";
+
 import { createCampaign } from "../../store/entities/campaigns.slice";
 import { campaignSchema } from "../../config/validation.schema";
 
@@ -43,32 +47,48 @@ const CampaignDialog = ({ open, onClose }) => {
 
   const campaigns = useSelector((state) => state.campaigns);
   const [slugDirty, setSlugDirty] = useState(false);
-  const [errorShowing, showError] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
 
+  const unwrapResult = (response) => {
+    if (response.payload.error) throw response.payload.error;
+    if (response.error) throw response.error;
+    return response.payload;
+  };
+
   const onSubmit = (data) => {
     setSubmitted(true);
-    dispatch(createCampaign(data));
+    dispatch(createCampaign(data))
+      .then(unwrapResult)
+      .then(handleClose)
+      .catch((err) => {
+        switch (err.name) {
+          case "MongoError":
+            if (err.code === 11000) {
+              // Duplicate Unique Key Error
+              setError(`The ${Object.keys(err.keyValue)[0]} is already in use.  Please change and try again.`);
+            } else {
+              setError("A database error occured.  Please try again.");
+            }
+            break;
+          case "ValidationError":
+            // Todo: Shouldn't happen, but just in case, one day you should handle this.
+            setError("Validation error.");
+            break;
+          default:
+            setError(err.message);
+        }
+      })
+      .finally(() => setSubmitted(false));
   };
 
   const closeError = () => {
-    showError(false);
+    setError("");
   };
-
-  useEffect(() => {
-    if (submitted) {
-      if (campaigns.modifyError) {
-        showError(true);
-      } else {
-        handleClose();
-      }
-      setSubmitted(false);
-    }
-  }, [campaigns, handleClose, submitted]);
 
   return (
     <Dialog onClose={handleClose} aria-labelledby="-dialog-title" open={open}>
@@ -207,9 +227,12 @@ const CampaignDialog = ({ open, onClose }) => {
           </Button>
         </form>
       </DialogContent>
-      <Snackbar open={errorShowing} autoHideDuration={6000} onClose={closeError}>
+      <Backdrop className={classes.backdrop} open={submitted}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={closeError}>
         <Alert onClose={closeError} severity="error">
-          {campaigns.modifyError}
+          {error}
         </Alert>
       </Snackbar>
     </Dialog>

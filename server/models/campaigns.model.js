@@ -36,7 +36,7 @@ const campaignsSchema = mongoose.Schema(
     nominateStart: Date,
     minAge: Number,
     slug: { type: String, unique: true },
-    campaignName: String,
+    campaignName: { type: String, unique: true },
     public: Boolean,
     questions: [questionSchema],
   },

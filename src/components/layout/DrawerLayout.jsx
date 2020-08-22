@@ -16,12 +16,20 @@ import {
   ListSubheader,
   Toolbar,
   Typography,
+  ListItemSecondaryAction,
 } from "@material-ui/core";
-import { ExitToApp as LogoutIcon, WhereToVote as VoteIcon, Menu as MenuIcon, AccountCircle } from "@material-ui/icons";
+import {
+  ExitToApp as LogoutIcon,
+  WhereToVote as VoteIcon,
+  Menu as MenuIcon,
+  // Edit as EditIcon,
+  Delete as DeleteIcon,
+  AccountCircle,
+} from "@material-ui/icons";
 import CampaignDialog from "../dialogs/Campaign.dialog";
 
 import { logout } from "../../store/auth.slice";
-import { getCampaigns } from "../../store/entities/campaigns.slice";
+import { getCampaigns, deleteCampaign as deleteCampaignById } from "../../store/entities/campaigns.slice";
 
 const drawerWidth = 240;
 
@@ -41,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: drawerWidth,
     },
   },
-  username: { fontSize: "2rem" },
+  username: { fontSize: "2rem", marginLeft: "auto" },
   menuButton: {
     marginRight: theme.spacing(2),
     [theme.breakpoints.up("sm")]: {
@@ -61,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ResponsiveDrawer = ({ title, children }) => {
+const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const classes = useStyles();
@@ -71,9 +79,20 @@ const ResponsiveDrawer = ({ title, children }) => {
 
   const auth = useSelector((state) => state.auth);
   const campaigns = useSelector((state) => state.campaigns);
-
+  const { slug } = match.params;
+  console.log("match", match);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const deleteCampaign = (id, redirectAfter) => {
+    const confirmed = window.confirm(
+      "Do you really want to delete this campaign?  It will delete all nominations and votes as well!"
+    );
+    if (confirmed) {
+      dispatch(deleteCampaignById(id));
+      if (redirectAfter) history.push("/campaign");
+    }
   };
 
   useEffect(() => {
@@ -85,20 +104,46 @@ const ResponsiveDrawer = ({ title, children }) => {
 
   const drawer = (
     <div>
-      <div className={classes.toolbar}>
-        <Typography align="center" className={classes.username}>
-          {auth.username}
-        </Typography>
-      </div>
-      <Divider />
+      <div className={classes.toolbar}></div>
+      {auth.isModerator && (
+        <>
+          <List subheader={<ListSubheader>Moderators</ListSubheader>} className={classes.toolbar_bottom}>
+            <ListItem button component={Link} to={`/mod`} selected={match.path === "/mod"}>
+              <ListItemIcon>
+                <VoteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItem>
+          </List>
+          <Divider />
+        </>
+      )}
       <List subheader={<ListSubheader>Campaigns</ListSubheader>} className={classes.toolbar_bottom}>
         {campaigns.entities.length ? (
           campaigns.entities.map((campaign, index) => (
-            <ListItem button key={campaign.slug} component={Link} to={`/campaign/${campaign.slug}`}>
+            <ListItem
+              button
+              key={campaign.slug}
+              component={Link}
+              to={`/campaign/${campaign.slug}`}
+              selected={slug === campaign.slug}
+            >
               <ListItemIcon>
                 <VoteIcon />
               </ListItemIcon>
               <ListItemText primary={campaign.campaignName} />
+              <ListItemSecondaryAction>
+                {/* <IconButton aria-label="edit question" edge="end">
+                  <EditIcon />
+                </IconButton> */}
+                <IconButton
+                  aria-label="delete question"
+                  edge="end"
+                  onClick={() => deleteCampaign(campaign._id, slug === campaign.slug)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
           ))
         ) : (
@@ -152,10 +197,13 @@ const ResponsiveDrawer = ({ title, children }) => {
           <Typography variant="h6" noWrap>
             {title}
           </Typography>
+          <Typography align="center" className={classes.username}>
+            {auth.username}
+          </Typography>
         </Toolbar>
       </AppBar>
 
-      <nav className={classes.drawer} aria-label="mailbox folders">
+      <nav className={classes.drawer} aria-label="navigation">
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden smUp implementation="css">
           <Drawer

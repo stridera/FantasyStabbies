@@ -7,48 +7,20 @@ export const getCampaigns = createAsyncThunk("campaigns/fetch", async () => {
   return response.data;
 });
 
-export const createCampaign = createAsyncThunk("campaigns/create", async (data) => {
-  const response = await campaignsService.createCampaign(data);
-  return response.data;
+export const createCampaign = createAsyncThunk("campaign/create", async (data, { rejectWithValue }) => {
+  try {
+    const response = await campaignsService.createCampaign(data);
+    return response.data;
+  } catch (err) {
+    if (!err.response) throw err;
+    return rejectWithValue(err.response.data);
+  }
 });
 
-// export const createCampaign = (data) => async (dispatch) => {
-//   try {
-//     dispatch({ type: newCampaignRequested.type });
-//     const res = await campaignsService.createCampaign(data);
-
-//     if (res.data.success) {
-//       const campaign = res.data.campaign;
-//       dispatch({ type: campaignCreated.type, payload: campaign });
-//     } else {
-//       dispatch({
-//         type: campaignCreationFailed.type,
-//         payload: res.error,
-//       });
-//     }
-//   } catch (err) {
-//     const data = err.response?.data;
-//     let error = "An error has occured.";
-//     switch (data?.name) {
-//       case "MongoError":
-//         error =
-//           data.code === 11000
-//             ? "Slug already in use.  Please change and try again."
-//             : "Database error.  Please try again.";
-//         break;
-//       case "ValidationError":
-//         error = `Validation Error: ${data.message}`;
-//         break;
-//       default:
-//         error = err.response?.data?.message || err.message;
-//     }
-
-//     dispatch({
-//       type: campaignCreationFailed.type,
-//       payload: error,
-//     });
-//   }
-// };
+export const deleteCampaign = createAsyncThunk("campaign/delete", async (campaignId) => {
+  const response = await campaignsService.deleteCampagin(campaignId);
+  return response.data;
+});
 
 const campaignsSlice = createSlice({
   name: "campaigns",
@@ -62,21 +34,6 @@ const campaignsSlice = createSlice({
   },
   reducers: {},
   extraReducers: {
-    // Create
-    [createCampaign.pending]: (state, action) => {
-      state.loading = true;
-      state.error = null;
-    },
-    [createCampaign.fulfilled]: (state, action) => {
-      state.entities.push(action.payload);
-      state.loading = false;
-      state.error = null;
-    },
-    [createCampaign.rejected]: (state, action) => {
-      state.loading = false;
-      state.error = action.error;
-    },
-
     // Get
     [getCampaigns.pending]: (state, action) => {
       state.loading = true;
@@ -98,6 +55,40 @@ const campaignsSlice = createSlice({
       state.loading = false;
       state.error = action.error;
       state.currentRequestId = undefined;
+    },
+
+    // Create
+    [createCampaign.pending]: (state, action) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [createCampaign.fulfilled]: (state, action) => {
+      state.entities.push(action.payload.campaign);
+      state.loading = false;
+      state.error = null;
+    },
+    [createCampaign.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload ? action.payload.error : action.error;
+      console.dir(action);
+    },
+
+    // Delete
+    [deleteCampaign.pending]: (state, action) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [deleteCampaign.fulfilled]: (state, action) => {
+      console.dir(action);
+      const index = state.entities.findIndex((campaign) => campaign._id === action.meta.arg);
+      if (index !== -1) state.entities.splice(index, 1);
+      state.loading = false;
+      state.error = null;
+    },
+    [deleteCampaign.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload ? action.payload.error : action.error;
+      console.dir(action);
     },
   },
 });
