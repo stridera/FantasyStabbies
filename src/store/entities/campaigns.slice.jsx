@@ -2,6 +2,13 @@ import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import * as campaignsService from "../../services/campaigns.service";
 import moment from "moment";
 
+export const statusStates = {
+  waiting: "waiting",
+  nominating: "nominating",
+  voting: "voting",
+  ended: "ended",
+};
+
 export const getCampaigns = createAsyncThunk("campaigns/fetch", async () => {
   const response = await campaignsService.getCampaigns();
   return response.data;
@@ -26,8 +33,8 @@ const campaignsSlice = createSlice({
   name: "campaigns",
   initialState: {
     entities: [],
-    loaded: false,
     loading: false,
+    loadingComplete: false,
     error: null,
     currentRequestId: undefined,
     lastUpdate: 0,
@@ -44,7 +51,7 @@ const campaignsSlice = createSlice({
       const { requestId } = action.meta;
       if (state.loading && state.currentRequestId === requestId) {
         state.entities = action.payload.campaigns;
-        state.loaded = true;
+        state.loadingComplete = true;
         state.loading = false;
         state.currentRequestId = undefined;
         state.error = null;
@@ -53,8 +60,10 @@ const campaignsSlice = createSlice({
     },
     [getCampaigns.rejected]: (state, action) => {
       state.loading = false;
+      state.loadingComplete = true;
       state.error = action.error;
       state.currentRequestId = undefined;
+      state.lastUpdate = new moment().format();
     },
 
     // Create
@@ -105,3 +114,30 @@ export const getCampaignBySlug = (slug) =>
     (state) => state.campaigns.entities,
     (campaigns) => campaigns.find((campaign) => campaign.slug === slug)
   );
+export const getCampaignStatus = (campaign) => {
+  const now = new moment();
+  var diff;
+
+  diff = moment(campaign.nominateStart).diff(now);
+  if (diff > 0) {
+    return {
+      status: statusStates.waiting,
+      message: `Nominations starts in ${moment.duration(diff).humanize()}.`,
+    };
+  }
+
+  diff = moment(campaign.voteStart).diff(now);
+  if (diff > 0) {
+    return {
+      status: statusStates.nominating,
+      message: `Taking nominations.  Voting starts in ${moment.duration(diff).humanize()}.`,
+    };
+  }
+
+  diff = moment(campaign.endDate).diff(now);
+  if (diff > 0) {
+    return { status: statusStates.voting, message: `Voting Ends in ${moment.duration(diff).humanize()}.` };
+  }
+
+  return { status: statusStates.ended, message: `Voting ended ${moment.duration(diff).humanize()} ago.` };
+};

@@ -18,11 +18,12 @@ const ProtectedRoute = ({ component: Component, layout: Layout, condition, title
     if (auth.loaded && !auth.isAuthenticated) {
       setLoginRequired(true);
       setLoading(false);
-    } else if (auth.loaded && campaigns.loaded) {
+    } else if (auth.loaded && campaigns.loadingComplete) {
       setAllowed(isAllowed());
       setLoading(false);
     }
-  }, [auth.loaded, auth.isAuthenticated, campaigns.loaded, isAllowed]);
+    // console.log("Protected Route Debug. Loading:", loading, "Allowed:", allowed, "Login Required:", loginRequired);
+  }, [auth.loaded, auth.isAuthenticated, campaigns.loadingComplete, isAllowed]);
 
   return (
     <Route

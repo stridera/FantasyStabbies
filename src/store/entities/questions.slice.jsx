@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import * as campaignsService from "../../services/campaigns.service";
 import moment from "moment";
 
@@ -104,3 +104,9 @@ const campaignsSlice = createSlice({
 });
 
 export default campaignsSlice.reducer;
+
+export const getQuestionById = (id) =>
+  createSelector(
+    (state) => state.questions.entities,
+    (questions) => questions.find((question) => question._id === id)
+  );

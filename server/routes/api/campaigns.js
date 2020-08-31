@@ -5,86 +5,85 @@ const questionRouter = require("./questions");
 const Campaigns = require("../../models/campaigns.model");
 const { campaignSchema, updateCampaignSchema } = require("../../../src/config/validation.schema");
 
-const getCampaign = async (query, publicOnly) => {
-  if (publicOnly) {
-    query.public = true;
+const notFoundError = { status: 404, message: "Campaign not found." };
+
+const getCampaign = async (condition, publicOnly = true, skipQuestions = true) => {
+  let query = Campaigns.findOne(condition);
+  if (skipQuestions) {
+    query.select("-questions");
   }
-  const campaign = await Campaigns.findOne(query);
-  return campaign;
+  if (publicOnly) {
+    query.where("public", true);
+  }
+  return await query;
 };
 
 // Campaigns
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     let query = Campaigns.find().select("-questions");
     if (!req.user.moderator) {
-      query.where(public, true);
+      query.where("public", true);
     }
     const campaigns = await query;
-    res.send({ success: true, campaigns });
+    return res.send({ campaigns });
   } catch (err) {
-    res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const campaign = await getCampaign({ _id: req.params.id }, !req.user.moderator);
     if (campaign) {
-      res.send({ success: true, campaign });
+      return res.send({ campaign });
     } else {
-      return res.status(404).send({ success: false, error: "Campaign not found." });
+      return next(notFoundError);
     }
   } catch (err) {
-    res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
-router.post("/", ensureModerator, async (req, res) => {
+router.post("/", ensureModerator, async (req, res, next) => {
   try {
     campaignSchema
       .validate(req.body)
       .then(async (data) => {
         const campaign = new Campaigns(data);
         await campaign.save();
-        return res.send({ success: true, campaign });
+        return res.send({ campaign });
       })
       .catch((err) => {
-        if (err.name == "ValidationError" || err.name == "MongoError") {
-          return res.status(500).send({ success: false, error: err });
-        }
-        return res.status(500).send({ success: false, error: err.message });
+        return next(err);
       });
   } catch (err) {
-    return res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
-router.patch("/:id", ensureModerator, async (req, res) => {
+router.patch("/:id", ensureModerator, async (req, res, next) => {
   try {
     updateCampaignSchema
       .validate(req.body)
       .then(async (data) => {
         const results = await Campaigns.updateOne({ _id: req.params.id }, data);
-        return res.send({ success: true, results });
+        return res.send({ results });
       })
       .catch((err) => {
-        if (err.name == "ValidationError" || err.name == "MongoError") {
-          return res.status(500).send({ success: false, error: err });
-        }
-        return res.status(500).send({ success: false, error: err.message });
+        return next(err);
       });
   } catch (err) {
-    return res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
-router.delete("/:id", ensureModerator, async (req, res) => {
+router.delete("/:id", ensureModerator, async (req, res, next) => {
   try {
     const results = await Campaigns.deleteOne({ _id: req.params.id });
-    return res.send({ success: true, results });
+    return res.send({ results });
   } catch (err) {
-    return res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
@@ -93,15 +92,15 @@ router.use(
   "/:id/questions",
   async (req, res, next) => {
     try {
-      const campaign = await getCampaign({ _id: req.params.id }, !req.user.moderator);
+      const campaign = await getCampaign({ _id: req.params.id }, !req.user.moderator, false);
       if (campaign) {
         req.campaign = campaign;
-        next();
+        return next();
       } else {
-        return res.status(404).send({ success: false, error: "Campaign not found." });
+        return next(notFoundError);
       }
     } catch (err) {
-      res.status(500).send({ success: false, error: err.message });
+      return next(err);
     }
   },
   questionRouter

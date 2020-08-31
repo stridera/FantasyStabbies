@@ -3,28 +3,30 @@ const nominationRouter = require("./nominations");
 const { ensureModerator } = require("../../middleware/auth.middleware");
 const { questionSchema } = require("../../../src/config/validation.schema");
 
+const notFoundError = { status: 404, message: "Question not found." };
+
 const getQuestionById = async (req, id) => {
   return req.campaign.questions.find((question) => question._id == id);
 };
 
-router.get("/", async (req, res) => {
-  return res.send({ success: true, campaign: req.campaign._id, questions: req.campaign.questions });
+router.get("/", async (req, res, next) => {
+  return res.send({ campaign: req.campaign._id, questions: req.campaign.questions || [] });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const question = await getQuestionById(req, req.params.id);
     if (question) {
-      return res.send({ success: true, campaign: req.campaign._id, question });
+      return res.send({ campaign: req.campaign._id, question });
     } else {
-      return res.status(404).send({ success: false, error: "Question not found." });
+      return next(notFoundError);
     }
   } catch (err) {
-    res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
-router.post("/", ensureModerator, async (req, res) => {
+router.post("/", ensureModerator, async (req, res, next) => {
   const campaign = req.campaign;
   questionSchema
     .validate(req.body)
@@ -33,17 +35,15 @@ router.post("/", ensureModerator, async (req, res) => {
       const results = await campaign.questions.push(question);
       if (results) {
         await campaign.save();
-        setTimeout(() => {
-          return res.send({ success: true, campaign: req.campaign._id, question });
-        }, 3000);
+        return res.send({ campaign: req.campaign._id, question });
       }
     })
     .catch((err) => {
-      return res.status(500).send({ success: false, error: err.message });
+      return next(err);
     });
 });
 
-router.patch("/:id", ensureModerator, async (req, res) => {
+router.patch("/:id", ensureModerator, async (req, res, next) => {
   try {
     const question = await getQuestionById(req, req.params.id);
     if (question) {
@@ -52,23 +52,23 @@ router.patch("/:id", ensureModerator, async (req, res) => {
         .then(async (data) => {
           question.set(data);
           await req.campaign.save();
-          return res.send({ success: true, campaign: req.campaign._id, question });
+          return res.send({ campaign: req.campaign._id, question });
         })
         .catch((err) => {
           if (err.name == "ValidationError") {
             return res.status(500).send({ success: false, error: err });
           }
-          return res.status(500).send({ success: false, error: err.message });
+          return next(err);
         });
     } else {
-      return res.status(404).send({ success: false, error: "Question not found." });
+      return next(notFoundError);
     }
   } catch (err) {
-    res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
-router.delete("/:id", ensureModerator, async (req, res) => {
+router.delete("/:id", ensureModerator, async (req, res, next) => {
   try {
     const question = await getQuestionById(req, req.params.id);
     if (question) {
@@ -76,10 +76,10 @@ router.delete("/:id", ensureModerator, async (req, res) => {
       await req.campaign.save();
       return res.send({ success: true });
     } else {
-      return res.status(404).send({ success: false, error: "Question not found." });
+      return next(notFoundError);
     }
   } catch (err) {
-    res.status(500).send({ success: false, error: err.message });
+    return next(err);
   }
 });
 
@@ -93,10 +93,10 @@ router.use(
         req.question = question;
         next();
       } else {
-        return res.status(404).send({ success: false, error: "Question not found." });
+        return next(notFoundError);
       }
     } catch (err) {
-      res.status(500).send({ success: false, error: err.message });
+      return next(err);
     }
   },
   nominationRouter

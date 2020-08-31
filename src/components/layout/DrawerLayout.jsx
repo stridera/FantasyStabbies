@@ -20,7 +20,9 @@ import {
 } from "@material-ui/core";
 import {
   ExitToApp as LogoutIcon,
+  Assistant as ModIcon,
   WhereToVote as VoteIcon,
+  AddLocation as VoteAddIcon,
   Menu as MenuIcon,
   // Edit as EditIcon,
   Delete as DeleteIcon,
@@ -80,7 +82,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
   const auth = useSelector((state) => state.auth);
   const campaigns = useSelector((state) => state.campaigns);
   const { slug } = match.params;
-  console.log("match", match);
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -96,11 +98,12 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
   };
 
   useEffect(() => {
+    if (!auth.isAuthenticated) return history.push("/");
     if (campaigns.loading) return;
 
     const minSinceLastUpdate = moment().diff(moment(campaigns.lastUpdate), "minute");
     if (minSinceLastUpdate > 1) dispatch(getCampaigns());
-  }, [campaigns, dispatch]);
+  }, [auth.isAuthenticated, history, campaigns, dispatch]);
 
   const drawer = (
     <div>
@@ -110,7 +113,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
           <List subheader={<ListSubheader>Moderators</ListSubheader>} className={classes.toolbar_bottom}>
             <ListItem button component={Link} to={`/mod`} selected={match.path === "/mod"}>
               <ListItemIcon>
-                <VoteIcon />
+                <ModIcon />
               </ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItem>
@@ -119,41 +122,38 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
         </>
       )}
       <List subheader={<ListSubheader>Campaigns</ListSubheader>} className={classes.toolbar_bottom}>
-        {campaigns.entities.length ? (
-          campaigns.entities.map((campaign, index) => (
-            <ListItem
-              button
-              key={campaign.slug}
-              component={Link}
-              to={`/campaign/${campaign.slug}`}
-              selected={slug === campaign.slug}
-            >
-              <ListItemIcon>
-                <VoteIcon />
-              </ListItemIcon>
-              <ListItemText primary={campaign.campaignName} />
-              <ListItemSecondaryAction>
-                {/* <IconButton aria-label="edit question" edge="end">
-                  <EditIcon />
-                </IconButton> */}
-                <IconButton
-                  aria-label="delete question"
-                  edge="end"
-                  onClick={() => deleteCampaign(campaign._id, slug === campaign.slug)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))
-        ) : (
-          <ListItem>
+        <ListItem button component={Link} to="/campaign" key="campaigns" selected={match.path === "/campaign"}>
+          <ListItemIcon>
+            <VoteIcon />
+          </ListItemIcon>
+          <ListItemText primary="Dashboard" />
+        </ListItem>
+        {campaigns.entities.map((campaign) => (
+          <ListItem
+            button
+            key={campaign.slug}
+            component={Link}
+            to={`/campaign/${campaign.slug}`}
+            selected={slug === campaign.slug}
+          >
             <ListItemIcon>
               <VoteIcon />
             </ListItemIcon>
-            <ListItemText primary={campaigns.loading ? "Loading..." : "No campaigns!"} />
+            <ListItemText primary={campaign.campaignName} />
+            <ListItemSecondaryAction>
+              {/* <IconButton aria-label="edit campaign" edge="end">
+                  <EditIcon />
+                </IconButton> */}
+              <IconButton
+                aria-label="delete campaign"
+                edge="end"
+                onClick={() => deleteCampaign(campaign._id, slug === campaign.slug)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
           </ListItem>
-        )}
+        ))}
         {auth.isModerator && <CampaignDialog />}
       </List>
       <Divider />

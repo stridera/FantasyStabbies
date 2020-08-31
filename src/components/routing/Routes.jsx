@@ -7,7 +7,8 @@ import Drawer from "../layout/DrawerLayout";
 import NotFound from "../layout/NotFound";
 
 import Mod from "../Pages/Mod";
-import { CampaignsComponent, CampaignDetailsComponent } from "../Pages/Campaign";
+import CampaignsComponent from "../Pages/Campaign";
+// import { CampaignsComponent, CampaignDetailsComponent } from "../Pages/Campaign";
 import Profile from "../Pages/Profile";
 import Auth, { AfterAuth } from "../Pages/Auth";
 
@@ -22,13 +23,13 @@ const Routes = () => {
     return auth.isModerator;
   };
 
-  const slugExists = ({ campaigns, computedMatch }) => {
-    const { slug } = computedMatch.params;
-    if (!slug) return false;
-    const campaign = campaigns.entities.find((c) => c.slug === slug);
-    console.log("test", slug, campaign);
-    return !!campaign;
-  };
+  // const slugExists = ({ campaigns, computedMatch }) => {
+  //   const { slug } = computedMatch.params;
+  //   if (!slug) return false;
+  //   const campaign = campaigns.entities.find((c) => c.slug === slug);
+  //   console.log("test", slug, campaign);
+  //   return !!campaign;
+  // };
 
   return (
     <Switch>
@@ -41,8 +42,8 @@ const Routes = () => {
 
       {/* Moderators */}
       <ProtectedRoute
-        exact
         path="/mod"
+        exact
         condition={isMod}
         layout={Drawer}
         title={title}
@@ -52,22 +53,22 @@ const Routes = () => {
 
       {/* Campaigns */}
       <ProtectedRoute
-        exact
-        path="/campaign"
+        path="/campaign/:slug?/:questionID?"
         condition={isAuthenticated}
         layout={Drawer}
         title={title}
         setTitle={setTitle}
         component={CampaignsComponent}
       />
-      <ProtectedRoute
-        path="/campaign/:slug"
+
+      {/* <ProtectedRoute
+        path="/campaign/:slug/:questionID"
         condition={slugExists}
         layout={Drawer}
         title={title}
         setTitle={setTitle}
         component={CampaignDetailsComponent}
-      />
+      /> */}
 
       {/* Profile */}
       <ProtectedRoute

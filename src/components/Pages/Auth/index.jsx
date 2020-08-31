@@ -12,7 +12,7 @@ export const AfterAuth = () => {
   useEffect(() => {
     console.log("Checking auth.", auth.isAuthenticated);
     if (auth.isAuthenticated) {
-      auth.isModerator ? history.push("/mod") : history.push("/vote");
+      auth.isModerator ? history.push("/mod") : history.push("/campaign");
     }
   }, [auth.isAuthenticated, auth.isModerator, history]);
 

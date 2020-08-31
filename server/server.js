@@ -48,6 +48,18 @@ app.use("/auth", authRouter);
 const apiRouter = require("./routes/api");
 app.use("/api", apiRouter);
 
+app.use((err, req, res, next) => {
+  // Fallback to default node handler
+  if (res.headersSent) {
+    next(err);
+    return;
+  }
+
+  winston.error(err.message, { url: req.originalUrl });
+  res.status(err.status || 500);
+  res.json({ error: err.message });
+});
+
 // App Configuration
 const PORT = process.env.PORT || 5000;
 

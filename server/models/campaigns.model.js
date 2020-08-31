@@ -15,6 +15,8 @@ const nominationSchema = mongoose.Schema(
     link: String,
     note: String,
     valid: Boolean,
+    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    nominators: [voteScheme],
     votes: [voteScheme],
   },
   { timestamps: true }

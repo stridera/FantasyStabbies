@@ -8,7 +8,7 @@ import Alert from "../../custom/Alert";
 import { Card, CardHeader, CardContent, Button, CircularProgress } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
 
-import Snoo from "./img/fantasy.png";
+import Snoo from "../../../img/fantasy.png";
 
 const useStyles = makeStyles({
   root: {
@@ -51,7 +51,7 @@ const Auth = () => {
       if (from) {
         history.push(location.state.from.pathname);
       } else {
-        auth.isModerator ? history.push("/mod") : history.push("/vote");
+        auth.isModerator ? history.push("/mod") : history.push("/campaign");
       }
     }
   }, [auth, history, location.state, campaigns.loaded]);

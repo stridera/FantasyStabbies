@@ -21,7 +21,7 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core";
-import { Add as AddIcon } from "@material-ui/icons";
+import { Add as AddIcon, AddLocation as VoteAddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
 
 import { createCampaign } from "../../store/entities/campaigns.slice";
@@ -77,7 +77,7 @@ const CampaignDialog = ({ open, onClose }) => {
             break;
           case "ValidationError":
             // Todo: Shouldn't happen, but just in case, one day you should handle this.
-            setError("Validation error.");
+            setError("Validation error.  Please try again.");
             break;
           default:
             setError(err.message);
@@ -254,7 +254,7 @@ const CampaignDialogHandler = ({ values }) => {
     <div>
       <ListItem button key="add_campaign" onClick={handleClickOpen}>
         <ListItemIcon>
-          <AddIcon />
+          <VoteAddIcon />
         </ListItemIcon>
         <ListItemText primary={"Add campaign"} />
       </ListItem>
