@@ -30,7 +30,6 @@
     "http-proxy-middleware": "^1.0.5",
     "lodash": "^4.17.20",
     "moment": "^2.24.0",
-    "mongoose": "^5.9.27",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "passport": "^0.4.1",
@@ -71,5 +70,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devServer": {
+    "compress": true,
+    "public": "rfantasy.com"
   }
 }

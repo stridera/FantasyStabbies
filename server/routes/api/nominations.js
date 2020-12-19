@@ -6,7 +6,7 @@ router.get("/", async (req, res) => {
   return res.send({ success: true, nominations: req.question.nominations });
 });
 
-router.post("/?error=signed_out", async (req, res) => {
+router.post("/", async (req, res) => {
   const campaign = req.campaign;
   nominationSchema
     .validate(req.body)
