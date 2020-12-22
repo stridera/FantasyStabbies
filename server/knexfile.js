@@ -2,11 +2,19 @@
 require("dotenv").config({ path: "../.env" });
 
 console.log("Database URL: " + process.env.DATABASE_URL);
+console.log("Cert: " + process.env.DATABASE_CA_CERT);
 
 module.exports = {
   development: {
     client: "pg",
     connection: process.env.DATABASE_URL,
   },
+  development: {
+    client: "pg",
+    connection: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: true,
+        ca: process.env.DATABASE_CA_CERT,
+    },
+  },
 };
-// psql postgres://strider:ojYKLR4f0MQWYlaLT4wbf0@localhost:5432/fantasy
