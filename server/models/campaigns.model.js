@@ -1,50 +1,14 @@
-const mongoose = require("mongoose");
+const { Model } = require("objection");
 
-const voteScheme = mongoose.Schema(
-  {
-    voter: { type: mongoose.Schema.Types.ObjectId, ref: "User", unique: true },
-  },
-  { timestamps: true }
-);
+const tableNames = require("../db/tableNames");
 
-const nominationSchema = mongoose.Schema(
-  {
-    nominator: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    title: String,
-    type: String,
-    link: String,
-    note: String,
-    valid: Boolean,
-    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    nominators: [voteScheme],
-    votes: [voteScheme],
-  },
-  { timestamps: true }
-);
+class User extends Model {
+  static get tableName() {
+    return tableNames.user;
+  }
 
-const questionSchema = mongoose.Schema(
-  {
-    question: String,
-    source: String,
-    nominations: [nominationSchema],
-  },
-  { timestamps: true }
-);
-
-const campaignsSchema = mongoose.Schema(
-  {
-    endDate: Date,
-    voteStart: Date,
-    nominateStart: Date,
-    minAge: Number,
-    slug: { type: String, unique: true },
-    campaignName: { type: String, unique: true },
-    public: Boolean,
-    questions: [questionSchema],
-  },
-  { timestamps: true }
-);
-
-const Campaigns = mongoose.model("Campaigns", campaignsSchema);
-
+  static get jsonSchema() {
+    return schema;
+  }
+}
 module.exports = Campaigns;

@@ -1,5 +1,8 @@
 const addDevUser = (req) => {
-  if (process.env.ENV == "dev" && req.headers.authorization == `Bearer ${process.env.DEV_TOKEN}`) {
+  if (
+    process.env.ENV == "dev" &&
+    req.headers.authorization == `Bearer ${process.env.DEV_TOKEN}`
+  ) {
     const ismod = req.headers["is-mod"] ? true : false;
     if (!req.user) {
       console.log(`Simulating user.  Moderator? ${ismod}`);

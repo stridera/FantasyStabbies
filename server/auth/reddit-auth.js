@@ -1,7 +1,6 @@
 const RedditStrategy = require("passport-reddit").Strategy;
-
 const User = require("../models/user.model");
-const isMod = require("../models/mods.model");
+const isMod = require("../services/mods");
 
 // Use the RedditStrategy within Passport.
 
@@ -15,25 +14,28 @@ const RedditAuth = (passport) => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          const existingUser = await User.findOne({ redditId: profile.id });
+          const existingUser = await User.query()
+            .where("reddit_id", profile.id)
+            .first();
           const isUserModerator = await isMod(profile.name);
 
           if (existingUser) {
-            existingUser.moderator = isUserModerator;
-            existingUser.iconURL = profile.icon_img;
+            existingUser.is_moderator = isUserModerator;
+            // existingUser.iconURL = profile.icon_img;
             existingUser.save();
             return done(null, existingUser);
           }
 
           // We don't have a user record with this ID, make a new record.
           // This is only stored to match votes to a name.
-          const user = await new User({
+
+          const user = await User.query().insert({
             username: profile.name,
-            redditId: profile.id,
-            iconURL: profile.icon_img,
-            moderator: isUserModerator,
-            created: Date.now(profile.created),
-          }).save();
+            reddit_id: profile.id,
+            // iconURL: profile.icon_img,
+            is_moderator: isUserModerator,
+            reddit_created: new Date(profile._json.created_utc * 1000),
+          });
           done(null, user);
         } catch (err) {
           done(err, null);
