@@ -11,10 +11,16 @@ module.exports = {
   },
   production: {
     client: "pg",
-    connection: process.env.DATABASE_URL,
-    ssl: {
+    connection: {
+      host: process.env.DATABASE_HOSTNAME,
+      database: process.env.DATABASE_NAME,
+      user: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      port: process.env.DATABASE_PORT,
+      ssl: {
         rejectUnauthorized: true,
         ca: process.env.DATABASE_CA_CERT,
+      },
     },
   },
 };
