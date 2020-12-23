@@ -7,8 +7,8 @@ const tableNames = require("../db/tableNames");
 exports.up = async (knex) => {
   await knex.schema.createTable(tableNames.user, (table) => {
     table.increments("id");
-    table.string("reddit_id", 8).notNullable().unique();
-    table.string("username", 8).notNullable().unique();
+    table.string("reddit_id").notNullable().unique();
+    table.string("username").notNullable().unique();
     table.boolean("is_moderator").notNullable().defaultTo(false);
     table.timestamp("reddit_created").notNullable();
     table.boolean("is_banned").defaultTo(false);
