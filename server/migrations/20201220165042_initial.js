@@ -30,11 +30,18 @@ exports.up = async (knex) => {
 
   await knex.schema.createTable(tableNames.campaign, (table) => {
     table.increments("id");
-    table.string("title", 255).notNullable();
+    table.string("name").notNullable().unique();
+    table.string("slug").notNullable().unique();
+    table.boolean("public").notNullable().defaultTo(false);
+    table.integer("min_account_age").notNullable().defaultTo(0);
+    table.timestamp("nominate_start_date").notNullable();
+    table.timestamp("nominate_end_date").notNullable();
+    table.timestamp("vote_start_date").notNullable();
+    table.timestamp("end_date").notNullable();
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable(tableNames.question, (table) => {
+  await knex.schema.createTable(tableNames.category, (table) => {
     table.increments("id");
     table.string("title", 255).notNullable();
     table.timestamps(true, true);

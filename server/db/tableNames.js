@@ -2,7 +2,7 @@ module.exports = {
   user: "user",
   approvers: "approvers",
   campaign: "campaign",
-  question: "question",
+  category: "category",
   work: "work",
   nomination: "nomination",
   votes: "votes",

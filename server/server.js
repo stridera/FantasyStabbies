@@ -16,7 +16,7 @@ const winston = require("./services/winston");
 const pg = require("./db");
 
 var sess = {
-  secret: "snoo fantasy stabbies",
+  secret: process.env.SESSION_SECRET || "snoo fantasy stabbies",
   resave: false,
   saveUninitialized: false,
   cookie: {},

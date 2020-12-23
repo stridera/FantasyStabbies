@@ -32,11 +32,11 @@ const authSlice = createSlice({
     },
     [login.fulfilled]: (auth, action) => {
       auth.isAuthenticated = true;
-      auth.userID = action.payload._id;
+      auth.userID = action.payload.id;
       auth.username = action.payload.username;
-      auth.isModerator = action.payload.moderator || false;
-      auth.redditID = action.payload.redditId;
-      auth.created = action.payload.created;
+      auth.isModerator = action.payload.is_moderator || false;
+      auth.redditID = action.payload.reddit_id;
+      auth.created = action.payload.reddit_created;
       auth.loading = false;
       auth.loaded = true;
     },
