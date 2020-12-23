@@ -20,9 +20,9 @@ const RedditAuth = (passport) => {
           const isUserModerator = await isMod(profile.name);
 
           if (existingUser) {
-            existingUser.is_moderator = isUserModerator;
-            // existingUser.iconURL = profile.icon_img;
-            existingUser.save();
+            if (existingUser.is_moderator != isUserModerator) {
+              existingUser.patch({ is_moderator: isUserModerator });
+            }
             return done(null, existingUser);
           }
 
@@ -49,7 +49,9 @@ const RedditAuth = (passport) => {
   });
 
   passport.deserializeUser((id, done) => {
-    User.findById(id)
+    console.log("ID: ", id);
+    User.query()
+      .where("reddit_id", id)
       .then((user) => {
         done(null, user);
       })
