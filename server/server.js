@@ -15,6 +15,11 @@ const winston = require("./services/winston");
 // Database
 const pg = require("./db");
 
+if (process.env.ENV == "production") {
+  console.log("Trusting the proxy.");
+  app.set("trust proxy", 1);
+}
+
 app.use(
   session({
     secret: "snoo fantasy stabbies",
