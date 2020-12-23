@@ -15,19 +15,20 @@ const winston = require("./services/winston");
 // Database
 const pg = require("./db");
 
-if (process.env.ENV == "production") {
-  console.log("Trusting the proxy.");
-  app.set("trust proxy", 1);
+var sess = {
+  secret: "snoo fantasy stabbies",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {},
+};
+
+if (app.get("env") === "production") {
+  console.log("Production mode.  Trusting proxy, requiring secure cookies.");
+  app.set("trust proxy", 1); // trust first proxy
+  sess.cookie.secure = true; // serve secure cookies
 }
 
-app.use(
-  session({
-    secret: "snoo fantasy stabbies",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: process.env.ENV != "dev" },
-  })
-);
+app.use(session(sess));
 
 // Allow serving the react app on prod
 app.use(express.static(path.join(__dirname, "..", "build")));
