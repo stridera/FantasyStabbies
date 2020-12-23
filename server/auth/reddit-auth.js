@@ -51,7 +51,7 @@ const RedditAuth = (passport) => {
   passport.deserializeUser((id, done) => {
     console.log("ID: ", id);
     User.query()
-      .where("reddit_id", id)
+      .where("id", id)
       .then((user) => {
         done(null, user);
       })

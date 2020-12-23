@@ -18,6 +18,7 @@ router.route("/callback").get((req, res, next) => {
       failureRedirect: "/?error=auth_failed",
     })(req, res, next);
   } else {
+    console.log("Session Mismatch: ${req.query.state} != ${req.session.state}");
     res.redirect("/?error=session_mismatch");
   }
 });
