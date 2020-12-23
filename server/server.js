@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 
+const path = require("path");
 const app = express();
 
 const session = require("express-session"); // Need to store state var for reddit auth
@@ -23,6 +24,9 @@ app.use(
   })
 );
 
+// Allow serving the react app on prod
+app.use(express.static(path.join(__dirname, "..", "build")));
+
 // Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,6 +45,10 @@ app.use("/auth", authRouter);
 
 const apiRouter = require("./routes/api");
 app.use("/api", apiRouter);
+
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, "..", "build", "index.html"));
+});
 
 app.use((err, req, res, next) => {
   // Fallback to default node handler

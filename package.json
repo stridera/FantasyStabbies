@@ -5,15 +5,14 @@
   "description": "Reddit /r/fantasy stabby voting site.",
   "scripts": {
     "start-server": "cross-env NODE_ENV=development nodemon server/server.js --watch 'server/*'",
-    "start-prod-server": "cross-env NODE_ENV=production node server/server.js",
     "start-front": "react-scripts start",
-    "build-front": "react-scripts build",
+    "start": "concurrently \"yarn run start-server\" \"yarn run start-front\" --kill-others",
+    "build": "rm -r build 2>/dev/null;react-scripts build",
+    "start-prod": "node server/server.js",
     "migrate": "knex --knexfile=./server/knexfile.js migrate:latest",
     "rollback": "knex --knexfile=./server/knexfile.js migrate:rollback",
     "eject": "react-scripts eject",
-    "test": "react-scripts test",
-    "start": "concurrently \"yarn run start-server\" \"yarn run start-front\" --kill-others",
-    "start-prod": "concurrently \"yarn run start-prod-server\" \"yarn run start-front\" --kill-others"
+    "test": "react-scripts test"
   },
   "proxy": "http://localhost:5000",
   "author": "Matthew Strider Jones (stridera)",
