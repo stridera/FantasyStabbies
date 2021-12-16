@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 
-import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import { blueGrey } from "@material-ui/core/colors";
 
 import store from "./store/store";
@@ -12,7 +12,7 @@ import { login } from "./store/auth.slice";
 import { getCampaigns } from "./store/entities/campaigns.slice";
 
 const App = () => {
-  const theme = createMuiTheme({
+  const theme = createTheme({
     typography: {
       useNextVariants: true,
     },

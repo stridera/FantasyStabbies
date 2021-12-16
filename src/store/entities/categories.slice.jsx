@@ -3,32 +3,32 @@ import * as campaignsService from "../../services/campaigns.service";
 import moment from "moment";
 
 // Actions
-export const getQuestionsForCampaign = createAsyncThunk("questions/fetch", async (campaignId) => {
-  const response = await campaignsService.getQuestions(campaignId);
+export const getCategoriesForCampaign = createAsyncThunk("categories/fetch", async (campaignId) => {
+  const response = await campaignsService.getCategories(campaignId);
   return response.data;
 });
 
-export const createQuestionForCampaign = createAsyncThunk("questions/create", async (data) => {
-  const { campaignId, question, source } = data;
-  const response = await campaignsService.createQuestion(campaignId, question, source);
+export const createCategoryForCampaign = createAsyncThunk("categories/create", async (data) => {
+  const { campaignId, category, source } = data;
+  const response = await campaignsService.createCategory(campaignId, category, source);
   return response.data;
 });
 
-export const deleteQuestionFromCampaign = createAsyncThunk("questions/delete", async (data) => {
-  const { campaignId, questionId } = data;
-  const response = await campaignsService.deleteQuestion(campaignId, questionId);
+export const deleteCategoryFromCampaign = createAsyncThunk("categories/delete", async (data) => {
+  const { campaignId, categoryId } = data;
+  const response = await campaignsService.deleteCategory(campaignId, categoryId);
   return response.data;
 });
 
-export const editQuestionFromCampaign = createAsyncThunk("questions/edit", async (data) => {
-  const { campaignId, questionId, question, source } = data;
-  const response = await campaignsService.editQuestion(campaignId, questionId, question, source);
+export const editCategoryFromCampaign = createAsyncThunk("categories/edit", async (data) => {
+  const { campaignId, categoryId, category, source } = data;
+  const response = await campaignsService.editCategory(campaignId, categoryId, category, source);
   return response.data;
 });
 
 // Slice
 const campaignsSlice = createSlice({
-  name: "questions",
+  name: "categories",
   initialState: {
     campaign: null,
     entities: [],
@@ -41,22 +41,22 @@ const campaignsSlice = createSlice({
   reducers: {},
   extraReducers: {
     // Load
-    [getQuestionsForCampaign.pending]: (state, action) => {
+    [getCategoriesForCampaign.pending]: (state, action) => {
       state.loading = true;
       state.error = null;
       state.currentRequestId = action.meta.requestId;
     },
-    [getQuestionsForCampaign.fulfilled]: (state, action) => {
+    [getCategoriesForCampaign.fulfilled]: (state, action) => {
       const { requestId } = action.meta;
       if (state.loading && state.currentRequestId === requestId) {
         state.campaign = action.payload.campaign;
-        state.entities = action.payload.questions;
+        state.entities = action.payload.categories;
         state.lastUpdate = new moment().format();
         state.loading = false;
         state.currentRequestId = undefined;
       }
     },
-    [getQuestionsForCampaign.rejected]: (state, action) => {
+    [getCategoriesForCampaign.rejected]: (state, action) => {
       const { requestId } = action.meta;
       if (state.loading && state.currentRequestId === requestId) {
         state.loading = false;
@@ -66,36 +66,36 @@ const campaignsSlice = createSlice({
     },
 
     // Create
-    [createQuestionForCampaign.pending]: (state, action) => {
+    [createCategoryForCampaign.pending]: (state, action) => {
       state.loading = true;
       state.error = null;
       state.currentRequestId = action.meta.requestId;
     },
-    [createQuestionForCampaign.fulfilled]: (state, action) => {
+    [createCategoryForCampaign.fulfilled]: (state, action) => {
       state.campaign = action.payload.campaign;
-      state.entities.push(action.payload.question);
+      state.entities.push(action.payload.category);
       state.lastUpdate = new moment().format();
       state.loading = false;
     },
-    [createQuestionForCampaign.rejected]: (state, action) => {
+    [createCategoryForCampaign.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.error;
       state.currentRequestId = undefined;
     },
 
     // Delete
-    [deleteQuestionFromCampaign.pending]: (state, action) => {
+    [deleteCategoryFromCampaign.pending]: (state, action) => {
       state.loading = true;
       state.error = null;
       state.currentRequestId = action.meta.requestId;
     },
-    [deleteQuestionFromCampaign.fulfilled]: (state, action) => {
-      const index = state.entities.findIndex((question) => question._id === action.meta.arg.questionId);
+    [deleteCategoryFromCampaign.fulfilled]: (state, action) => {
+      const index = state.entities.findIndex((category) => category.id === action.meta.arg.categoryId);
       if (index !== -1) state.entities.splice(index, 1);
       state.loading = false;
       state.currentRequestId = undefined;
     },
-    [deleteQuestionFromCampaign.rejected]: (state, action) => {
+    [deleteCategoryFromCampaign.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.error;
       state.currentRequestId = undefined;
@@ -105,8 +105,8 @@ const campaignsSlice = createSlice({
 
 export default campaignsSlice.reducer;
 
-export const getQuestionById = (id) =>
+export const getCategoryById = (id) =>
   createSelector(
-    (state) => state.questions.entities,
-    (questions) => questions.find((question) => question._id === id)
+    (state) => state.categories.entities,
+    (categories) => categories.find((category) => category.id === id)
   );

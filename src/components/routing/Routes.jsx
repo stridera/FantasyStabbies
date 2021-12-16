@@ -19,7 +19,7 @@ const Routes = () => {
     return auth.isAuthenticated;
   };
 
-  const isMod = ({ auth }) => {
+  const isModerator = ({ auth }) => {
     return auth.isModerator;
   };
 
@@ -44,7 +44,7 @@ const Routes = () => {
       <ProtectedRoute
         path="/mod"
         exact
-        condition={isMod}
+        condition={isModerator}
         layout={Drawer}
         title={title}
         setTitle={setTitle}

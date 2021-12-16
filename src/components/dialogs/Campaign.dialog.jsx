@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers";
+import { yupResolver } from "@hookform/resolvers/yup";
 import slugify from "slugify";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -21,7 +21,7 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core";
-import { Add as AddIcon, AddLocation as VoteAddIcon } from "@material-ui/icons";
+import { AddLocation as VoteAddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
 
 import { createCampaign } from "../../store/entities/campaigns.slice";
@@ -41,7 +41,12 @@ const CampaignDialog = ({ open, onClose }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit, setValue, errors } = useForm({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(campaignSchema),
   });
 
@@ -98,18 +103,18 @@ const CampaignDialog = ({ open, onClose }) => {
           <Grid container spacing={2}>
             <Grid item xs={10}>
               <TextField
-                inputRef={register}
+                {...register("name")}
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                id="campaignName"
+                id="name"
                 label="Campaign Name"
-                name="campaignName"
-                autoComplete="campaignName"
+                name="name"
+                autoComplete="name"
                 autoFocus
-                error={!!errors.campaignName}
-                helperText={errors.campaignName?.message}
+                error={!!errors.name}
+                helperText={errors.name?.message}
                 onChange={(event) => {
                   slugDirty || setValue("slug", slugify(event.target.value, { lower: true, strict: true }));
                 }}
@@ -117,7 +122,7 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item xs={2}>
               <FormControlLabel
-                inputRef={register}
+                {...register("public")}
                 variant="outlined"
                 control={<Switch />}
                 id="public"
@@ -128,7 +133,7 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                inputRef={register}
+                {...register("slug")}
                 variant="outlined"
                 margin="normal"
                 required
@@ -148,7 +153,7 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                inputRef={register}
+                {...register("minAge")}
                 variant="outlined"
                 margin="normal"
                 required
@@ -162,7 +167,7 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item sm={4}>
               <TextField
-                inputRef={register}
+                {...register("nominateStart")}
                 variant="outlined"
                 id="nominateStart"
                 name="nominateStart"
@@ -180,7 +185,7 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item sm={4}>
               <TextField
-                inputRef={register}
+                {...register("voteStart")}
                 variant="outlined"
                 id="voteStart"
                 name="voteStart"
@@ -198,7 +203,7 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item sm={4}>
               <TextField
-                inputRef={register}
+                {...register("endDate")}
                 variant="outlined"
                 id="endDate"
                 name="endDate"

@@ -7,14 +7,11 @@ import {
   Card,
   Grid,
   CardActionArea,
-  CardMedia,
   Button,
   CardContent,
   CardActions,
 } from "@material-ui/core";
 import { ArrowBackIos as BackIcon } from "@material-ui/icons";
-import Snoo from "../../../img/fantasy.png";
-
 import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
 import { useHistory } from "react-router";
 
@@ -43,12 +40,12 @@ const QuestionComponent = ({ setTitle, campaign, question }) => {
     setStatusMsg(status.message);
   }, [campaign]);
 
-  useEffect(() => setTitle(`Campaign: ${campaign.campaignName} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
+  useEffect(() => setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
 
   const classes = useStyles();
   return (
     <>
-      <Box borderRadius={6} variant="outlined" key={question._id} className={classes.question}>
+      <Box borderRadius={6} variant="outlined" key={question.id} className={classes.question}>
         <IconButton
           aria-label="back to campaign"
           onClick={() => history.push(`/campaign/${campaign.slug}`)}
@@ -81,7 +78,7 @@ const QuestionComponent = ({ setTitle, campaign, question }) => {
           </Card>
         </Grid>
         {question.nominations.map((nomination) => (
-          <Grid item lg={3} key={nomination._id}>
+          <Grid item lg={3} key={nomination.id}>
             <Card className={classes.card}>
               <NominationCard nomination={nomination} />
             </Card>

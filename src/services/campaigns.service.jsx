@@ -19,19 +19,19 @@ export const getCampaigns = async () => {
   return await axios.get(baseURL);
 };
 
-// Questions
-export const getQuestions = async (campaignId) => {
-  return await axios.get(`${baseURL}/${campaignId}/questions`);
+// Categories
+export const getCategories = async (campaignId) => {
+  return await axios.get(`${baseURL}/${campaignId}/category`);
 };
 
-export const createQuestion = async (campaignId, question, source) => {
-  return await axios.post(`${baseURL}/${campaignId}/questions`, { question, source });
+export const createCategory = async (campaignId, category, source) => {
+  return await axios.post(`${baseURL}/${campaignId}/category`, { category, source });
 };
 
-export const deleteQuestion = async (campaignId, questionId) => {
-  return await axios.delete(`${baseURL}/${campaignId}/questions/${questionId}`);
+export const deleteCategory = async (campaignId, categoryId) => {
+  return await axios.delete(`${baseURL}/${campaignId}/category/${categoryId}`);
 };
 
-export const editQuestion = async (campaignId, questionId, question, source) => {
-  return await axios.patch(`${baseURL}/${campaignId}/questions/${questionId}`, { question, source });
+export const editCategory = async (campaignId, categoryId, category, source) => {
+  return await axios.patch(`${baseURL}/${campaignId}/category/${categoryId}`, { category, source });
 };

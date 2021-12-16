@@ -3,7 +3,6 @@ const User = require("../models/user.model");
 const isMod = require("../services/mods");
 
 // Use the RedditStrategy within Passport.
-
 const RedditAuth = (passport) => {
   passport.use(
     new RedditStrategy(
@@ -14,21 +13,23 @@ const RedditAuth = (passport) => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          const existingUser = await User.query()
-            .where("reddit_id", profile.id)
-            .first();
-          const isUserModerator = await isMod(profile.name);
+          const existingUser = await User.query().where("reddit_id", profile.id).first();
+
+          // const isUserModerator = await isMod(profile.name);
+          const isUserModerator = isMod(profile.name);
 
           if (existingUser) {
             if (existingUser.is_moderator != isUserModerator) {
-              existingUser.patch({ is_moderator: isUserModerator });
+              const existingUser = await User.query()
+                .where("reddit_id", profile.id)
+                .patch({ is_moderator: isUserModerator });
             }
             return done(null, existingUser);
           }
 
           // We don't have a user record with this ID, make a new record.
           // This is only stored to match votes to a name.
-
+          console.log("Saving new user.  Is moderator?  ", isUserModerator);
           const user = await User.query().insert({
             username: profile.name,
             reddit_id: profile.id,

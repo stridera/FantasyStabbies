@@ -2,10 +2,12 @@ const router = require("express").Router();
 
 const { ensureAuthenticated } = require("../middleware/auth.middleware");
 
-const userRouter = require("./api/user");
-const campaignRouter = require("./api/campaigns");
+const usersRouter = require("./api/users");
+const campaignsRouter = require("./api/campaigns");
+const booksRouter = require("./api/books");
 
-router.use("/user", ensureAuthenticated, userRouter);
-router.use("/campaigns", ensureAuthenticated, campaignRouter);
+router.use("/users", ensureAuthenticated, usersRouter);
+router.use("/campaigns", ensureAuthenticated, campaignsRouter);
+router.use("/books", ensureAuthenticated, booksRouter);
 
 module.exports = router;

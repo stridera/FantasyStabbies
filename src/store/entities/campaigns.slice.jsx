@@ -50,7 +50,7 @@ const campaignsSlice = createSlice({
     [getCampaigns.fulfilled]: (state, action) => {
       const { requestId } = action.meta;
       if (state.loading && state.currentRequestId === requestId) {
-        state.entities = action.payload.campaigns;
+        state.entities = action.payload;
         state.loadingComplete = true;
         state.loading = false;
         state.currentRequestId = undefined;
@@ -88,8 +88,7 @@ const campaignsSlice = createSlice({
       state.error = null;
     },
     [deleteCampaign.fulfilled]: (state, action) => {
-      console.dir(action);
-      const index = state.entities.findIndex((campaign) => campaign._id === action.meta.arg);
+      const index = state.entities.findIndex((campaign) => campaign.id === action.meta.arg);
       if (index !== -1) state.entities.splice(index, 1);
       state.loading = false;
       state.error = null;

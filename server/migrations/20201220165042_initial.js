@@ -12,16 +12,11 @@ exports.up = async (knex) => {
     table.boolean("is_moderator").notNullable().defaultTo(false);
     table.timestamp("reddit_created").notNullable();
     table.boolean("is_banned").defaultTo(false);
-    table
-      .integer("banned_by")
-      .unsigned()
-      .nullable()
-      .references("id")
-      .inTable(tableNames.user);
+    table.integer("banned_by").unsigned().nullable().references("id").inTable(tableNames.user);
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable(tableNames.approvers, (table) => {
+  await knex.schema.createTable(tableNames.approver, (table) => {
     table.increments("id");
     table.string("type").notNullable();
     table.string("approver").notNullable();
@@ -36,106 +31,66 @@ exports.up = async (knex) => {
     table.integer("min_account_age").notNullable().defaultTo(0);
     table.timestamp("nominate_start_date").notNullable();
     table.timestamp("nominate_end_date").notNullable();
-    table.timestamp("vote_start_date").notNullable();
-    table.timestamp("end_date").notNullable();
+    table.timestamp("voting_start_date").notNullable();
+    table.timestamp("voting_end_date").notNullable();
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable(tableNames.category, (table) => {
     table.increments("id");
+    table.integer("campaign").unsigned().notNullable().references("id").inTable(tableNames.campaign);
     table.string("title", 255).notNullable();
+    table.string("description", 255);
+    table.string("type", 255).notNullable();
+    table.unique(["campaign", "title"]);
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable(tableNames.work, (table) => {
     table.increments("id");
+    table.string("google_book_id", 25).unique();
     table.string("title", 255).notNullable();
-    table.string("author", 255);
+    table.string("authors", 255).notNullable();
+    table.string("publisher", 255);
+    table.string("published_date", 255);
     table.string("source", 255);
-    table.string("source_url", 2000);
+    table.string("source_url", 2000).notNullable().unique();
     table.string("image_url", 2000);
     table.string("note", 2000);
     table.boolean("is_valid").defaultTo(false);
-    table
-      .integer("approved_by")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable(tableNames.user);
+    table.integer("approved_by").unsigned().references("id").inTable(tableNames.user);
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable(tableNames.nomination, (table) => {
     table.increments("id");
-    table
-      .integer("user")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable(tableNames.user);
-    table
-      .integer("work")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable(tableNames.work);
+    table.integer("user").unsigned().notNullable().references("id").inTable(tableNames.user);
+    table.integer("category").unsigned().notNullable().references("id").inTable(tableNames.category);
+    table.integer("work").unsigned().notNullable().references("id").inTable(tableNames.work);
+    table.unique(["user", "category", "work"]);
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable(tableNames.votes, (table) => {
+  await knex.schema.createTable(tableNames.vote, (table) => {
     table.increments("id");
-    table
-      .integer("user")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable(tableNames.user);
-    table
-      .integer("nomination")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable(tableNames.nomination);
+    table.integer("user").unsigned().notNullable().references("id").inTable(tableNames.user);
+    table.integer("nomination").unsigned().notNullable().references("id").inTable(tableNames.nomination);
+    table.string("ip_address", 255).notNullable();
     table.timestamps(true, true);
+    table.unique(["user", "nomination"]);
   });
 };
 
 exports.down = async (knex) => {
   await Promise.all(
     [
-      tableNames.votes,
+      tableNames.vote,
       tableNames.nomination,
       tableNames.work,
-      tableNames.approvers,
+      tableNames.category,
       tableNames.campaign,
-      tableNames.question,
+      tableNames.approver,
       tableNames.user,
     ].map((table) => knex.schema.dropTableIfExists(table))
   );
 };
-
-/*
-
-const questionSchema = mongoose.Schema(
-  {
-    question: String,
-    source: String,
-    nominations: [nominationSchema],
-  },
-  { timestamps: true }
-);
-
-const campaignsSchema = mongoose.Schema(
-  {
-    endDate: Date,
-    voteStart: Date,
-    nominateStart: Date,
-    minAge: Number,
-    slug: { type: String, unique: true },
-    campaignName: { type: String, unique: true },
-    public: Boolean,
-    questions: [questionSchema],
-  },
-  { timestamps: true }
-);
- */

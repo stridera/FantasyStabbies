@@ -18,7 +18,7 @@ const authSlice = createSlice({
     isAuthenticated: null,
     username: null,
     userID: null,
-    redditID: null,
+    reddit_id: null,
     isModerator: null,
     created: null,
     loading: false,
@@ -35,7 +35,7 @@ const authSlice = createSlice({
       auth.userID = action.payload.id;
       auth.username = action.payload.username;
       auth.isModerator = action.payload.is_moderator || false;
-      auth.redditID = action.payload.reddit_id;
+      auth.reddit_id = action.payload.reddit_id;
       auth.created = action.payload.reddit_created;
       auth.loading = false;
       auth.loaded = true;
@@ -52,7 +52,7 @@ const authSlice = createSlice({
       auth.isAuthenticated = null;
       auth.username = null;
       auth.userID = null;
-      auth.redditID = null;
+      auth.reddit_id = null;
       auth.isModerator = null;
       auth.created = null;
       auth.loading = false;

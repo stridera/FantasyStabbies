@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import _ from "lodash";
 import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Dialog,
@@ -21,10 +21,10 @@ import { Add as AddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
 import { useSelector, useDispatch } from "react-redux";
 import allowedSources from "../../config/sources";
-import { createQuestionForCampaign } from "../../store/entities/questions.slice";
-import { questionSchema } from "../../config/validation.schema";
+import { createCategoryForCampaign } from "../../store/entities/categories.slice";
+import { categorieschema } from "../../config/validation.schema";
 
-const QuestionDialog = ({ campaign, open, onClose }) => {
+const CategoryDialog = ({ campaign, open, onClose }) => {
   const useStyles = makeStyles((theme) => ({
     form: {
       width: "100%", // Fix IE 11 issue.
@@ -33,7 +33,7 @@ const QuestionDialog = ({ campaign, open, onClose }) => {
     submit: {
       margin: theme.spacing(3, 0, 2),
     },
-    addQuestionFab: {
+    addCategoryFab: {
       position: "absolute",
       bottom: theme.spacing(2),
       right: theme.spacing(2),
@@ -52,9 +52,9 @@ const QuestionDialog = ({ campaign, open, onClose }) => {
 
   const onSubmit = (form) => {
     setSubmitted(true);
-    const data = { campaignId: campaign, question: form.question, source: form.source };
+    const data = { campaignId: campaign, category: form.category, source: form.source };
     console.log("Submitting", data);
-    dispatch(createQuestionForCampaign(data)).then((data) => {
+    dispatch(createCategoryForCampaign(data)).then((data) => {
       console.log("Request complete.", data);
       setSubmitted(false);
     });
@@ -75,13 +75,18 @@ const QuestionDialog = ({ campaign, open, onClose }) => {
     }
   }, [campaigns, handleClose, submitted]);
 
-  const { register, handleSubmit, errors, control } = useForm({
-    resolver: yupResolver(questionSchema),
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm({
+    resolver: yupResolver(categorieschema),
     defaultValues: { source: "" },
   });
   return (
-    <Dialog onClose={handleClose} aria-labelledby="question-dialog-title" open={open}>
-      <DialogTitle id="question-dialog-title">Add Question To Campaign</DialogTitle>
+    <Dialog onClose={handleClose} aria-labelledby="category-dialog-title" open={open}>
+      <DialogTitle id="category-dialog-title">Add Category To Campaign</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
@@ -92,13 +97,13 @@ const QuestionDialog = ({ campaign, open, onClose }) => {
                 margin="normal"
                 required
                 fullWidth
-                id="question"
-                label="Question Title"
-                name="question"
-                autoComplete="question"
+                id="category"
+                label="Category Title"
+                name="category"
+                autoComplete="category"
                 autoFocus
-                error={!!errors.question}
-                helperText={errors.question?.message}
+                error={!!errors.category}
+                helperText={errors.category?.message}
               />
             </Grid>
             <Grid item xs={12}>
@@ -142,7 +147,7 @@ const QuestionDialog = ({ campaign, open, onClose }) => {
   );
 };
 
-const AddQuestion = ({ campaign, values }) => {
+const AddCategory = ({ campaign, values }) => {
   const useStyles = makeStyles((theme) => ({
     form: {
       width: "100%", // Fix IE 11 issue.
@@ -151,7 +156,7 @@ const AddQuestion = ({ campaign, values }) => {
     submit: {
       margin: theme.spacing(3, 0, 2),
     },
-    addQuestionFab: {
+    addCategoryFab: {
       position: "absolute",
       bottom: theme.spacing(2),
       right: theme.spacing(2),
@@ -170,12 +175,12 @@ const AddQuestion = ({ campaign, values }) => {
   const classes = useStyles();
   return (
     <>
-      <Fab color="secondary" aria-label="Add Question" className={classes.addQuestionFab} onClick={handleClickOpen}>
+      <Fab color="secondary" aria-label="Add Category" className={classes.addCategoryFab} onClick={handleClickOpen}>
         <AddIcon />
       </Fab>
-      <QuestionDialog campaign={campaign} open={open} onClose={handleClose} values={values} />
+      <CategoryDialog campaign={campaign} open={open} onClose={handleClose} values={values} />
     </>
   );
 };
 
-export default AddQuestion;
+export default AddCategory;

@@ -17,8 +17,8 @@ import {
 } from "@material-ui/core";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@material-ui/icons";
 
-import AddQuestion from "../../dialogs/AddQuestion.dialog";
-import { deleteQuestionFromCampaign } from "../../../store/entities/questions.slice";
+import AddCategory from "../../dialogs/AddCategory.dialog";
+import { deleteCategoryFromCampaign } from "../../../store/entities/categories.slice";
 import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,16 +35,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CampaignDetailsComponent = ({ setTitle, campaign, questions, setError }) => {
+const CampaignDetailsComponent = ({ setTitle, campaign, categories, setError }) => {
   const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
-  const deleteQuestion = (id) => dispatch(deleteQuestionFromCampaign({ campaignId: campaign._id, questionId: id }));
-  // const editQuestion = (id) => dispatch(editQuestionFromCampaign(campaign._id, id));
+  const deleteCategory = (id) => dispatch(deleteCategoryFromCampaign({ campaignId: campaign.id, categoryId: id }));
+  // const editCategory = (id) => dispatch(editCategoryFromCampaign(campaign.id, id));
 
-  useEffect(() => setTitle(`Campaign: ${campaign.campaignName} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
+  useEffect(() => setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
 
   useEffect(() => {
     const status = getCampaignStatus(campaign);
@@ -62,34 +62,34 @@ const CampaignDetailsComponent = ({ setTitle, campaign, questions, setError }) =
         </Typography>
       </Box>
       <Grid container spacing={2}>
-        {_.map(questions.entities, (question) => (
-          <Grid item lg={3} key={question._id}>
+        {_.map(categories.entities, (category) => (
+          <Grid item lg={3} key={category.id}>
             <Card className={classes.card}>
               <CardContent>
                 <Typography className={classes.cardTitle} gutterBottom>
-                  Question:
+                  Category:
                 </Typography>
                 <Typography className={classes.cardContent} vatiant="h5" component="h2">
-                  {question.question}
+                  {category.category}
                 </Typography>
               </CardContent>
               <CardActions disableSpacing>
                 {status === statusStates.nominating && (
-                  <Button size="small" component={Link} to={`/campaign/${campaign.slug}/${question._id}`}>
+                  <Button size="small" component={Link} to={`/campaign/${campaign.slug}/${category.id}`}>
                     Nominations
                   </Button>
                 )}
                 {status === statusStates.voting && (
-                  <Button size="small" component={Link} to={`/campaign/${campaign.slug}/${question._id}`}>
+                  <Button size="small" component={Link} to={`/campaign/${campaign.slug}/${category.id}`}>
                     Vote
                   </Button>
                 )}
                 {auth.isModerator && (
                   <Box className={classes.modActions}>
-                    {/* <IconButton aria-label="edit question" onClick={() => editQuestion(question._id)}>
+                    {/* <IconButton aria-label="edit category" onClick={() => editCategory(category.id)}>
                         <EditIcon />
                       </IconButton> */}
-                    <IconButton aria-label="delete question" onClick={() => deleteQuestion(question._id)}>
+                    <IconButton aria-label="delete category" onClick={() => deleteCategory(category.id)}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
@@ -99,7 +99,7 @@ const CampaignDetailsComponent = ({ setTitle, campaign, questions, setError }) =
           </Grid>
         ))}
       </Grid>
-      {auth.isModerator && <AddQuestion campaign={campaign._id} />}
+      {auth.isModerator && <AddCategory campaign={campaign.id} />}
     </>
   );
 };

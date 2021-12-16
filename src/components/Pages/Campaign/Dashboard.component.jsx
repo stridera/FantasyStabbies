@@ -25,7 +25,7 @@ const Dashboard = ({ setTitle, campaigns }) => {
   return (
     <>
       {campaigns.entities.map((campaign) => (
-        <Box borderRadius={6} variant="outlined" key={campaign._id} className={classes.campaignBox}>
+        <Box borderRadius={6} variant="outlined" key={campaign.id} className={classes.campaignBox}>
           <Typography variant="h5" component="h2" align="center">
             {campaign.campaignName}
           </Typography>

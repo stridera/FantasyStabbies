@@ -1,24 +1,23 @@
 const router = require("express").Router();
 const { ensureModerator } = require("../../middleware/auth.middleware");
-// const questionRouter = require("./questions");
+const categoryRouter = require("./categories");
 
-const Campaigns = require("../../models/campaigns.model");
+const Campaigns = require("../../models/campaign.model");
 
-const {
-  campaignSchema,
-  updateCampaignSchema,
-} = require("../../../src/config/validation.schema");
+const { campaignSchema, updateCampaignSchema } = require("../../../src/config/validation.schema");
 
 const notFoundError = { status: 404, message: "Campaign not found." };
 
 // Campaigns
 router.get("/", async (req, res, next) => {
   try {
-    const campaigns = await Campaigns.query().where(
-      "public",
-      !req.user.moderator
-    );
-    return res.send({ campaigns });
+    let campaigns = await Campaigns.query();
+
+    if (req.user.is_moderator) {
+      return res.send(campaigns);
+    }
+
+    return res.send(campaigns.filter((campaign) => campaign.public));
   } catch (err) {
     return next(err);
   }
@@ -26,12 +25,10 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const campaign = await getCampaign(
-      { _id: req.params.id },
-      !req.user.moderator
-    );
-    if (campaign) {
-      return res.send({ campaign });
+    const campaign = await Campaigns.query().findById(req.params.id);
+
+    if (campaign && (campaign.public || req.user.is_moderator)) {
+      return res.send(campaign);
     } else {
       return next(notFoundError);
     }
@@ -45,11 +42,11 @@ router.post("/", ensureModerator, async (req, res, next) => {
     campaignSchema
       .validate(req.body)
       .then(async (data) => {
-        const campaign = Campaigns.query().insert(data);
-        return res.send({ campaign });
+        const campaign = await Campaigns.query().insert(data);
+        return res.status(201).send(campaign);
       })
       .catch((err) => {
-        return next(err);
+        return next({ status: 400, message: err.message });
       });
   } catch (err) {
     return next(err);
@@ -61,14 +58,11 @@ router.patch("/:id", ensureModerator, async (req, res, next) => {
     updateCampaignSchema
       .validate(req.body)
       .then(async (data) => {
-        const results = await Campaigns.query().patchAndFetchById(
-          req.params.id,
-          data
-        );
+        const results = await Campaigns.query().patchAndFetchById(req.params.id, data);
         return res.send({ results });
       })
       .catch((err) => {
-        return next(err);
+        return next({ status: 400, message: err.message });
       });
   } catch (err) {
     return next(err);
@@ -85,25 +79,27 @@ router.delete("/:id", ensureModerator, async (req, res, next) => {
 });
 
 // Categories
-// router.use(
-//   "/:id/category",
-//   async (req, res, next) => {
-//     try {
-//       const campaign = await Campaigns.query()
-//         .findById(req.params.id)
-//         .where("public", !req.user.moderator);
+router.use(
+  "/:id/category",
+  async (req, res, next) => {
+    try {
+      const campaign = await Campaigns.query()
+        .findById(req.params.id)
+        .where((b) => {
+          if (!req.user.is_moderator) b.where("public", true);
+        });
 
-//       if (campaign) {
-//         req.campaign = campaign;
-//         return next();
-//       } else {
-//         return next(notFoundError);
-//       }
-//     } catch (err) {
-//       return next(err);
-//     }
-//   },
-//   questionRouter
-// );
+      if (campaign) {
+        req.campaign = campaign;
+        return next();
+      } else {
+        return next(notFoundError);
+      }
+    } catch (err) {
+      return next(err);
+    }
+  },
+  categoryRouter
+);
 
 module.exports = router;

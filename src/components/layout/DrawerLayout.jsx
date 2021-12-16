@@ -139,7 +139,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
             <ListItemIcon>
               <VoteIcon />
             </ListItemIcon>
-            <ListItemText primary={campaign.campaignName} />
+            <ListItemText primary={campaign.name} />
             <ListItemSecondaryAction>
               {/* <IconButton aria-label="edit campaign" edge="end">
                   <EditIcon />
@@ -147,7 +147,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
               <IconButton
                 aria-label="delete campaign"
                 edge="end"
-                onClick={() => deleteCampaign(campaign._id, slug === campaign.slug)}
+                onClick={() => deleteCampaign(campaign.id, slug === campaign.slug)}
               >
                 <DeleteIcon />
               </IconButton>

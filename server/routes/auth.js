@@ -1,9 +1,12 @@
 const router = require("express").Router();
+const { addDevUser } = require("../middleware/auth.middleware");
 
 const reddit = require("./auth/reddit");
 router.use("/reddit", reddit);
 
 router.get("/user", (req, res) => {
+  addDevUser(req);
+
   if (req.user) {
     return res.send(req.user);
   } else {

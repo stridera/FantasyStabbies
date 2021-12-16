@@ -6,13 +6,13 @@ import { makeStyles, Container, Typography, Snackbar, Backdrop, CircularProgress
 import Alert from "../../custom/Alert";
 
 import { getCampaignBySlug } from "../../../store/entities/campaigns.slice";
-import { getQuestionsForCampaign, getQuestionById } from "../../../store/entities/questions.slice";
+import { getCategoriesForCampaign, getCategoryById } from "../../../store/entities/categories.slice";
 import { logout } from "../../../store/auth.slice";
 
 import Dashboard from "./Dashboard.component";
 import CampaignNotFound from "./NotFound";
 import CampaignDetailsComponent from "./Details.component";
-import QuestionComponent from "./Question.component";
+import CategoryComponent from "./Category.component";
 
 const refreshInterval = 60000;
 const useStyles = makeStyles((theme) => ({
@@ -29,22 +29,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CampaignsComponent = ({ setTitle, match }) => {
-  const { slug, questionID } = match.params;
+  const { slug, categoryID } = match.params;
   const history = useHistory();
   const dispatch = useDispatch();
 
   const campaigns = useSelector((state) => state.campaigns);
 
   const campaign = useSelector((state) => getCampaignBySlug(slug)(state));
-  const questions = useSelector((state) => state.questions);
-  const question = useSelector((state) => getQuestionById(questionID)(state));
+  const categories = useSelector((state) => state.categories);
+  const category = useSelector((state) => getCategoryById(categoryID)(state));
 
   const [error, setError] = useState("");
   const closeError = () => setError("");
 
-  const updateQuestions = useCallback(() => {
+  const updateCategories = useCallback(() => {
     if (campaign) {
-      dispatch(getQuestionsForCampaign(campaign._id)).then((data) => {
+      dispatch(getCategoriesForCampaign(campaign.id)).then((data) => {
         if (data.error) {
           if (data.error.message === "Request failed with status code 403") {
             dispatch(logout());
@@ -57,24 +57,29 @@ const CampaignsComponent = ({ setTitle, match }) => {
   }, [dispatch, campaign, history]);
 
   useEffect(() => {
-    updateQuestions();
+    updateCategories();
     const interval = setInterval(() => {
-      updateQuestions();
+      updateCategories();
     }, refreshInterval);
     return () => clearInterval(interval);
-  }, [updateQuestions]);
+  }, [updateCategories]);
 
   let renderComponent;
 
   if (slug) {
     if (campaign) {
-      if (questionID && question) {
+      if (categoryID && category) {
         renderComponent = (
-          <QuestionComponent setTitle={setTitle} campaign={campaign} question={question} setError={setError} />
+          <CategoryComponent setTitle={setTitle} campaign={campaign} category={category} setError={setError} />
         );
       } else {
         renderComponent = (
-          <CampaignDetailsComponent setTitle={setTitle} campaign={campaign} questions={questions} setError={setError} />
+          <CampaignDetailsComponent
+            setTitle={setTitle}
+            campaign={campaign}
+            categories={categories}
+            setError={setError}
+          />
         );
       }
     } else {
@@ -91,10 +96,10 @@ const CampaignsComponent = ({ setTitle, match }) => {
         {renderComponent}
         <Snackbar open={!!error} autoHideDuration={6000} onClose={closeError}>
           <Alert onClose={closeError} severity="error">
-            <Typography>Unable to grab questions for campaign. {error}</Typography>
+            <Typography>Unable to grab categories for campaign. {error}</Typography>
           </Alert>
         </Snackbar>
-        <Backdrop className={classes.backdrop} open={questions.loading}>
+        <Backdrop className={classes.backdrop} open={categories.loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
       </Container>

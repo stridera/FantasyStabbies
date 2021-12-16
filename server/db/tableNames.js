@@ -1,9 +1,9 @@
 module.exports = {
   user: "user",
-  approvers: "approvers",
+  approver: "approver",
   campaign: "campaign",
   category: "category",
   work: "work",
   nomination: "nomination",
-  votes: "votes",
+  vote: "vote",
 };
