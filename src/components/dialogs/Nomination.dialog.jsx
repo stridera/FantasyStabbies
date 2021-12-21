@@ -1,14 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, TextField, Grid, makeStyles } from "@material-ui/core";
 import { throttle } from "lodash";
 
 const useStyles = makeStyles((theme) => ({}));
-const AddNominationDialog = ({ question, dialogOpen, onClose }) => {
-  const type = question.source;
+const AddNominationDialog = ({ category, dialogOpen, onClose }) => {
+  const type = category.source;
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");
 
-  const performSearch = useMemo(
+  const throttleSearch = useMemo(
     () =>
       throttle((request, callback) => {
         console.log("Throttled request:", request);
@@ -18,10 +18,16 @@ const AddNominationDialog = ({ question, dialogOpen, onClose }) => {
   );
 
   const doSearch = (event) => {
-    performSearch(event.target.value, (results) => {
+    throttleSearch(event.target.value, (results) => {
       console.log("Callback", results);
     });
   };
+
+  useEffect(() => {
+    if (inputValue.length > 2) {
+      doSearch(inputValue);
+    }
+  }, [inputValue]);
 
   const classes = useStyles();
   return (
@@ -37,10 +43,7 @@ const AddNominationDialog = ({ question, dialogOpen, onClose }) => {
               variant="outlined"
               fullWidth
               helperText="Enter search terms or URL."
-              // onChange={doSearch}
-              onInputChange={(event, newInputValue) => {
-                setInputValue(newInputValue);
-              }}
+              onChange={doSearch}
             />
           </Grid>
           <Grid item xs></Grid>

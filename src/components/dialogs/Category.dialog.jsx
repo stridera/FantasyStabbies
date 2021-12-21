@@ -22,7 +22,7 @@ import Alert from "../custom/Alert";
 import { useSelector, useDispatch } from "react-redux";
 import allowedSources from "../../config/sources";
 import { createCategoryForCampaign } from "../../store/entities/categories.slice";
-import { categorieschema } from "../../config/validation.schema";
+import { categorySchema } from "../../config/validation.schema";
 
 const CategoryDialog = ({ campaign, open, onClose }) => {
   const useStyles = makeStyles((theme) => ({
@@ -52,7 +52,7 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
 
   const onSubmit = (form) => {
     setSubmitted(true);
-    const data = { campaignId: campaign, category: form.category, source: form.source };
+    const data = { campaignId: campaign, ...form };
     console.log("Submitting", data);
     dispatch(createCategoryForCampaign(data)).then((data) => {
       console.log("Request complete.", data);
@@ -81,9 +81,10 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
     formState: { errors },
     control,
   } = useForm({
-    resolver: yupResolver(categorieschema),
+    resolver: yupResolver(categorySchema),
     defaultValues: { source: "" },
   });
+
   return (
     <Dialog onClose={handleClose} aria-labelledby="category-dialog-title" open={open}>
       <DialogTitle id="category-dialog-title">Add Category To Campaign</DialogTitle>
@@ -92,37 +93,47 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                inputRef={register}
-                variant="outlined"
-                margin="normal"
+                {...register("title")}
                 required
                 fullWidth
-                id="category"
                 label="Category Title"
-                name="category"
-                autoComplete="category"
+                name="title"
+                autoComplete="title"
                 autoFocus
-                error={!!errors.category}
-                helperText={errors.category?.message}
+                error={!!errors.title}
+                helperText={errors.title?.message}
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControl variant="outlined" fullWidth className={classes.formControl}>
+              <TextField
+                {...register("description")}
+                required
+                fullWidth
+                label="Category Description"
+                name="description"
+                autoComplete="description"
+                error={!!errors.description}
+                helperText={errors.description?.message}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl variant="outlined" fullWidth className={classes.formControl} error={!!errors.source}>
                 <InputLabel>Source</InputLabel>
                 <Controller
-                  as={
-                    <Select>
+                  render={({ field }) => (
+                    <Select {...field}>
                       {_.map(allowedSources, (value, key) => (
                         <MenuItem id={key} key={key} value={key}>
                           {value}
                         </MenuItem>
                       ))}
                     </Select>
-                  }
+                  )}
                   name="source"
                   control={control}
                   required
                 />
+                {errors.source && <span>{errors.source.message}</span>}
               </FormControl>
             </Grid>
           </Grid>
@@ -147,7 +158,7 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
   );
 };
 
-const AddCategory = ({ campaign, values }) => {
+const CategoryDialogHelper = ({ campaign, values }) => {
   const useStyles = makeStyles((theme) => ({
     form: {
       width: "100%", // Fix IE 11 issue.
@@ -166,10 +177,12 @@ const AddCategory = ({ campaign, values }) => {
 
   const handleClickOpen = () => {
     setOpen(true);
+    console.log("Opening!");
   };
 
   const handleClose = () => {
     setOpen(false);
+    console.log("Closing!");
   };
 
   const classes = useStyles();
@@ -183,4 +196,4 @@ const AddCategory = ({ campaign, values }) => {
   );
 };
 
-export default AddCategory;
+export default CategoryDialogHelper;

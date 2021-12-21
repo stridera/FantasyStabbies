@@ -23,8 +23,9 @@ const App = () => {
     },
   });
 
-  store.dispatch(login());
-  store.dispatch(getCampaigns());
+  store.dispatch(login()).then(() => {
+    store.dispatch(getCampaigns());
+  });
 
   return (
     <Provider store={store}>

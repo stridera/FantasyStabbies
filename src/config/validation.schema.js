@@ -28,6 +28,7 @@ const updateCampaignSchema = yup.object().shape({
 const categorySchema = yup.object().shape({
   title: yup.string().required().min(3).max(255),
   description: yup.string().min(3).max(255),
+  source: yup.string().required().min(3).max(255),
 });
 
 const nominationSchema = yup.object().shape({

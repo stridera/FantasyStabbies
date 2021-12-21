@@ -34,10 +34,9 @@ const CampaignsComponent = ({ setTitle, match }) => {
   const dispatch = useDispatch();
 
   const campaigns = useSelector((state) => state.campaigns);
-
   const campaign = useSelector((state) => getCampaignBySlug(slug)(state));
   const categories = useSelector((state) => state.categories);
-  const category = useSelector((state) => getCategoryById(categoryID)(state));
+  const category = useSelector((state) => getCategoryById(parseInt(categoryID))(state));
 
   const [error, setError] = useState("");
   const closeError = () => setError("");

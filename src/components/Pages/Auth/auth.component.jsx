@@ -41,20 +41,21 @@ const useStyles = makeStyles({
 const Auth = () => {
   const history = useHistory();
   const auth = useSelector((state) => state.auth);
-  const campaigns = useSelector((state) => state.campaigns);
   const [error, setError] = useState("");
 
   const location = useLocation();
   useEffect(() => {
-    if (auth.isAuthenticated && campaigns.loaded) {
+    if (auth.isAuthenticated) {
       const from = location.state?.from?.pathname;
       if (from) {
+        console.log("from", from);
         history.push(location.state.from.pathname);
       } else {
+        console.log("logged in");
         auth.isModerator ? history.push("/mod") : history.push("/campaign");
       }
     }
-  }, [auth, history, location.state, campaigns.loaded]);
+  }, [auth, history, location.state]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);

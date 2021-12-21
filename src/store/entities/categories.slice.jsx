@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
-import * as campaignsService from "../../services/campaigns.service";
+import * as campaignsService from "../../services/api.service";
 import moment from "moment";
 
 // Actions
@@ -9,8 +9,8 @@ export const getCategoriesForCampaign = createAsyncThunk("categories/fetch", asy
 });
 
 export const createCategoryForCampaign = createAsyncThunk("categories/create", async (data) => {
-  const { campaignId, category, source } = data;
-  const response = await campaignsService.createCategory(campaignId, category, source);
+  const { campaignId, title, description, source } = data;
+  const response = await campaignsService.createCategory(campaignId, title, description, source);
   return response.data;
 });
 
@@ -21,18 +21,17 @@ export const deleteCategoryFromCampaign = createAsyncThunk("categories/delete", 
 });
 
 export const editCategoryFromCampaign = createAsyncThunk("categories/edit", async (data) => {
-  const { campaignId, categoryId, category, source } = data;
-  const response = await campaignsService.editCategory(campaignId, categoryId, category, source);
+  const { campaignId, categoryId, title, description, source } = data;
+  const response = await campaignsService.editCategory(campaignId, categoryId, title, description, source);
   return response.data;
 });
 
 // Slice
-const campaignsSlice = createSlice({
+const categorySlice = createSlice({
   name: "categories",
   initialState: {
     campaign: null,
     entities: [],
-
     loading: false,
     error: null,
     lastUpdate: 0,
@@ -73,7 +72,7 @@ const campaignsSlice = createSlice({
     },
     [createCategoryForCampaign.fulfilled]: (state, action) => {
       state.campaign = action.payload.campaign;
-      state.entities.push(action.payload.category);
+      state.entities.push(action.payload);
       state.lastUpdate = new moment().format();
       state.loading = false;
     },
@@ -103,10 +102,10 @@ const campaignsSlice = createSlice({
   },
 });
 
-export default campaignsSlice.reducer;
+export default categorySlice.reducer;
 
-export const getCategoryById = (id) =>
+export const getCategoryById = (categoryId) =>
   createSelector(
     (state) => state.categories.entities,
-    (categories) => categories.find((category) => category.id === id)
+    (categories) => categories.find((category) => category.id === categoryId)
   );

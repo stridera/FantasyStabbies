@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
-import { makeStyles, Box, Typography } from "@material-ui/core";
+import { makeStyles, Grid, Box, Typography } from "@material-ui/core";
+import { getCampaignStatus } from "../../../store/entities/campaigns.slice";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   content: {},
@@ -26,9 +28,26 @@ const Dashboard = ({ setTitle, campaigns }) => {
     <>
       {campaigns.entities.map((campaign) => (
         <Box borderRadius={6} variant="outlined" key={campaign.id} className={classes.campaignBox}>
-          <Typography variant="h5" component="h2" align="center">
-            {campaign.campaignName}
+          <Typography variant="h4" component="h2" align="center">
+            <Link to={`/campaign/${campaign.slug}`}>{campaign.name}</Link>
           </Typography>
+          <Typography variant="h5" align="center">
+            {getCampaignStatus(campaign).message}
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <p>Nominations Begin: {campaign.nominate_start_date}</p>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <p>Nominations End: {campaign.nominate_end_date}</p>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <p>Voting Begins: {campaign.voting_start_date}</p>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <p>Voting Ends: {campaign.voting_start_date}</p>
+            </Grid>
+          </Grid>
         </Box>
       ))}
     </>

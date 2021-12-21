@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   makeStyles,
   Box,
@@ -16,23 +16,29 @@ import { getCampaignStatus, statusStates } from "../../../store/entities/campaig
 import { useHistory } from "react-router";
 
 import NominationCard from "../../custom/NominationCard";
-import AddNominationDialog from "../../dialogs/AddNomination.dialog";
+import AddNominationDialog from "../../dialogs/Nomination.dialog";
+import { useDispatch, useSelector } from "react-redux";
+import { getNominationsForCategory } from "../../../store/entities/nominations.slice";
+
+const refreshInterval = 60000;
 
 const useStyles = makeStyles((theme) => ({
-  question: {
+  category: {
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(2),
     marginBottom: theme.spacing(2),
     backgroundColor: "#fff",
   },
-  questionTitle: { justifyContent: "right" },
+  categoryTitle: { justifyContent: "right" },
 }));
-const QuestionComponent = ({ setTitle, campaign, question }) => {
+const CategoryComponent = ({ setTitle, campaign, category }) => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const nominations = useSelector((state) => state.nominations.entities);
 
   useEffect(() => {
     const status = getCampaignStatus(campaign);
@@ -40,12 +46,40 @@ const QuestionComponent = ({ setTitle, campaign, question }) => {
     setStatusMsg(status.message);
   }, [campaign]);
 
+  const updateNominations = useCallback(() => {
+    if (campaign && category) {
+      console.log({ campaign, category });
+      dispatch(getNominationsForCategory({ campaignId: campaign.id, categoryId: category.id })).then((data) => {
+        if (data.error) {
+          if (data.error.message === "Request failed with status code 403") {
+            dispatch(logout());
+            return history.push("/");
+          }
+          setError(data.error.message);
+        }
+      });
+    }
+  }, [dispatch, campaign, category, history]);
+
+  useEffect(() => {
+    updateNominations();
+    const interval = setInterval(() => {
+      updateNominations();
+    }, refreshInterval);
+    return () => clearInterval(interval);
+  }, [updateNominations]);
+
   useEffect(() => setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
 
+  useEffect(() => {
+    console.log(nominations);
+  }, [nominations]);
+
+  console.log(nominations);
   const classes = useStyles();
   return (
     <>
-      <Box borderRadius={6} variant="outlined" key={question.id} className={classes.question}>
+      <Box borderRadius={6} variant="outlined" key={category.id} className={classes.category}>
         <IconButton
           aria-label="back to campaign"
           onClick={() => history.push(`/campaign/${campaign.slug}`)}
@@ -53,8 +87,13 @@ const QuestionComponent = ({ setTitle, campaign, question }) => {
         >
           <BackIcon />
         </IconButton>
-        <Typography variant="h5" component="h2" className={classes.questionTitle}>
-          {question.question}
+        <Typography variant="h5" component="h2" className={classes.categoryTitle}>
+          {category.title}
+        </Typography>
+      </Box>
+      <Box borderRadius={6} variant="outlined" className={classes.category}>
+        <Typography variant="h6" component="h2" className={classes.categoryTitle}>
+          {category.description}
         </Typography>
       </Box>
       <Grid container spacing={2}>
@@ -77,17 +116,18 @@ const QuestionComponent = ({ setTitle, campaign, question }) => {
             </CardActions>
           </Card>
         </Grid>
-        {question.nominations.map((nomination) => (
-          <Grid item lg={3} key={nomination.id}>
-            <Card className={classes.card}>
-              <NominationCard nomination={nomination} />
-            </Card>
-          </Grid>
-        ))}
+        {nominations &&
+          nominations.map((nomination) => (
+            <Grid item lg={3} key={nomination.id}>
+              <Card className={classes.card}>
+                <NominationCard nomination={nomination} />
+              </Card>
+            </Grid>
+          ))}
       </Grid>
-      <AddNominationDialog question={question} dialogOpen={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <AddNominationDialog category={category} dialogOpen={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
   );
 };
 
-export default QuestionComponent;
+export default CategoryComponent;

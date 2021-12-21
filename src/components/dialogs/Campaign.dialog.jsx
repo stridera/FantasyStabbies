@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -95,6 +95,10 @@ const CampaignDialog = ({ open, onClose }) => {
     setError("");
   };
 
+  // useEffect(() => {
+  //   console.log(errors);
+  // }, [errors]);
+
   return (
     <Dialog onClose={handleClose} aria-labelledby="-dialog-title" open={open}>
       <DialogTitle id="-dialog-title">Create New Campaign</DialogTitle>
@@ -153,24 +157,24 @@ const CampaignDialog = ({ open, onClose }) => {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                {...register("minAge")}
+                {...register("min_account_age")}
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                id="minAge"
-                name="minAge"
+                id="min_account_age"
+                name="min_account_age"
                 label="Minimum Account Age (Days)"
-                error={!!errors.minAge}
-                helperText={errors.minAge?.message}
+                error={!!errors.min_account_age}
+                helperText={errors.min_account_age?.message}
               />
             </Grid>
-            <Grid item sm={4}>
+            <Grid item sm={6}>
               <TextField
-                {...register("nominateStart")}
+                {...register("nominate_start_date")}
                 variant="outlined"
-                id="nominateStart"
-                name="nominateStart"
+                id="nominate_start_date"
+                name="nominate_start_date"
                 label="Nomination Start Date"
                 type="date"
                 required
@@ -179,16 +183,34 @@ const CampaignDialog = ({ open, onClose }) => {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                error={!!errors.nominateStart}
-                helperText={errors.nominateStart?.message}
+                error={!!errors.nominate_start_date}
+                helperText={errors.nominate_start_date?.message}
               />
             </Grid>
-            <Grid item sm={4}>
+            <Grid item sm={6}>
               <TextField
-                {...register("voteStart")}
+                {...register("nominate_end_date")}
                 variant="outlined"
-                id="voteStart"
-                name="voteStart"
+                id="nominate_end_date"
+                name="nominate_end_date"
+                label="Nomination End Date"
+                type="date"
+                required
+                fullWidth
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                error={!!errors.nominate_end_date}
+                helperText={errors.nominate_end_date?.message}
+              />
+            </Grid>
+            <Grid item sm={6}>
+              <TextField
+                {...register("voting_start_date")}
+                variant="outlined"
+                id="voting_start_date"
+                name="voting_start_date"
                 label="Voting Start Date"
                 type="date"
                 required
@@ -197,16 +219,16 @@ const CampaignDialog = ({ open, onClose }) => {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                error={!!errors.voteStart}
-                helperText={errors.voteStart?.message}
+                error={!!errors.voting_start_date}
+                helperText={errors.voting_start_date?.message}
               />
             </Grid>
-            <Grid item sm={4}>
+            <Grid item sm={6}>
               <TextField
-                {...register("endDate")}
+                {...register("voting_end_date")}
                 variant="outlined"
-                id="endDate"
-                name="endDate"
+                id="voting_end_date"
+                name="voting_end_date"
                 label="Voting End Date"
                 type="date"
                 required
@@ -215,8 +237,8 @@ const CampaignDialog = ({ open, onClose }) => {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                error={!!errors.endDate}
-                helperText={errors.endDate?.message}
+                error={!!errors.voting_end_date}
+                helperText={errors.voting_end_date?.message}
               />
             </Grid>
           </Grid>

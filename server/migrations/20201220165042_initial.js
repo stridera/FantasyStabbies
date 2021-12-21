@@ -41,7 +41,7 @@ exports.up = async (knex) => {
     table.integer("campaign").unsigned().notNullable().references("id").inTable(tableNames.campaign);
     table.string("title", 255).notNullable();
     table.string("description", 255);
-    table.string("type", 255).notNullable();
+    table.string("source", 255).notNullable();
     table.unique(["campaign", "title"]);
     table.timestamps(true, true);
   });
@@ -86,11 +86,11 @@ exports.down = async (knex) => {
     [
       tableNames.vote,
       tableNames.nomination,
-      tableNames.work,
       tableNames.category,
       tableNames.campaign,
       tableNames.approver,
       tableNames.user,
-    ].map((table) => knex.schema.dropTableIfExists(table))
+      tableNames.work,
+    ].map((table) => knex.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`))
   );
 };

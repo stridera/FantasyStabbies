@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
-import * as campaignsService from "../../services/campaigns.service";
+import * as campaignsService from "../../services/api.service";
 import moment from "moment";
 
 export const statusStates = {
@@ -72,14 +72,13 @@ const campaignsSlice = createSlice({
       state.error = null;
     },
     [createCampaign.fulfilled]: (state, action) => {
-      state.entities.push(action.payload.campaign);
+      state.entities.push(action.payload);
       state.loading = false;
       state.error = null;
     },
     [createCampaign.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload ? action.payload.error : action.error;
-      console.dir(action);
     },
 
     // Delete
@@ -96,7 +95,6 @@ const campaignsSlice = createSlice({
     [deleteCampaign.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload ? action.payload.error : action.error;
-      console.dir(action);
     },
   },
 });
@@ -106,7 +104,8 @@ export default campaignsSlice.reducer;
 export const allCampaigns = createSelector((state) => state.campaigns.entities);
 export const activeCampaigns = createSelector(
   (state) => state.campaigns.entities,
-  (campaigns) => campaigns.filter((campaign) => moment().isBetween(campaign.startDate, campaign.endDate))
+  (campaigns) =>
+    campaigns.filter((campaign) => moment().isBetween(campaign.nominate_start_date, campaign.voting_end_date))
 );
 export const getCampaignBySlug = (slug) =>
   createSelector(
@@ -117,7 +116,7 @@ export const getCampaignStatus = (campaign) => {
   const now = new moment();
   var diff;
 
-  diff = moment(campaign.nominateStart).diff(now);
+  diff = moment(campaign.nominate_start_date).diff(now);
   if (diff > 0) {
     return {
       status: statusStates.waiting,
@@ -125,17 +124,31 @@ export const getCampaignStatus = (campaign) => {
     };
   }
 
-  diff = moment(campaign.voteStart).diff(now);
-  if (diff > 0) {
+  const nom_diff = moment(campaign.nominate_end_date).diff(now);
+  const vote_diff = moment(campaign.voting_start_date).diff(now);
+
+  if (nom_diff > 0) {
     return {
       status: statusStates.nominating,
-      message: `Taking nominations.  Voting starts in ${moment.duration(diff).humanize()}.`,
+      message: `Taking nominations for ${moment.duration(nom_diff).humanize()}.  Voting starts in ${moment
+        .duration(vote_diff)
+        .humanize()}.`,
     };
   }
 
-  diff = moment(campaign.endDate).diff(now);
+  if (vote_diff > 0) {
+    return {
+      status: statusStates.waiting,
+      message: `Nominations starts in ${moment.duration(vote_diff).humanize()}.`,
+    };
+  }
+
+  diff = moment(campaign.voting_end_date).diff(now);
   if (diff > 0) {
-    return { status: statusStates.voting, message: `Voting Ends in ${moment.duration(diff).humanize()}.` };
+    return {
+      status: statusStates.voting,
+      message: `Accepting Votes.  Voting Ends in ${moment.duration(diff).humanize()}.`,
+    };
   }
 
   return { status: statusStates.ended, message: `Voting ended ${moment.duration(diff).humanize()} ago.` };

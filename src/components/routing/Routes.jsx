@@ -53,7 +53,7 @@ const Routes = () => {
 
       {/* Campaigns */}
       <ProtectedRoute
-        path="/campaign/:slug?/:questionID?"
+        path="/campaign/:slug?/:categoryID?"
         condition={isAuthenticated}
         layout={Drawer}
         title={title}
@@ -62,7 +62,7 @@ const Routes = () => {
       />
 
       {/* <ProtectedRoute
-        path="/campaign/:slug/:questionID"
+        path="/campaign/:slug/"
         condition={slugExists}
         layout={Drawer}
         title={title}

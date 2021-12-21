@@ -12,7 +12,7 @@ router.get("/", async (req, res, next) => {
   try {
     const campaign = req.campaign;
     const categories = await Category.query().where("campaign", campaign.id).select([]);
-    res.json(categories);
+    res.json({ campaign: campaign.id, categories });
   } catch (err) {
     next(err);
   }
@@ -37,11 +37,11 @@ router.post("/", ensureModerator, async (req, res, next) => {
       .validate(req.body)
       .then(async (data) => {
         const campaign = req.campaign;
-        const category = await Category.query().insert({
+        const categories = await Category.query().insert({
           ...data,
           campaign: campaign.id,
         });
-        return res.status(201).send(category);
+        return res.status(201).send({ campaign: campaign.id, categories });
       })
       .catch((err) => {
         if (err instanceof UniqueViolationError) {

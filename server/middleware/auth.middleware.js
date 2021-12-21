@@ -1,11 +1,13 @@
 const addDevUser = (req) => {
   if (["dev", "test"].includes(process.env.ENV) && req.headers.authorization == `Bearer ${process.env.DEV_TOKEN}`) {
+    const is_moderator = req.headers["x-is-moderator"] == "true";
+    if (process.env.ENV == "dev") console.log(`Mocking User.  Mod: ${is_moderator ? "true" : "false"}`);
     if (!req.user) {
       req.user = {
-        username: "dev_user",
+        username: `dev_${is_moderator ? "moderator" : "user"}`,
         id: parseInt(req.headers["x-user-id"]) || 10001,
         reddit_id: "4aulo",
-        is_moderator: req.headers["x-is-moderator"] === "true",
+        is_moderator: is_moderator,
         reddit_created: req.headers["x-reddit-created"] || "2020-08-11T16:30:38.564Z",
         loading: false,
         error: null,

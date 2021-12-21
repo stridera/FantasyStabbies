@@ -5,10 +5,6 @@ const session = require("express-session"); // Need to store state var for reddi
 const app = express();
 const path = require("path");
 
-// Logging Setup
-const morgan = require("morgan");
-const winston = require("./services/winston");
-
 // Database
 const pg = require("./db");
 
@@ -51,17 +47,5 @@ app.use("/auth", authRouter);
 
 const apiRouter = require("./routes/api");
 app.use("/api", apiRouter);
-
-app.use((err, req, res, next) => {
-  // Fallback to default node handler
-  if (res.headersSent) {
-    next(err);
-    return;
-  }
-
-  if (app.get("env") !== "test") winston.error(err.message, { url: req.originalUrl });
-  res.status(err.status || 500);
-  res.json({ error: err.message });
-});
 
 module.exports = app;
