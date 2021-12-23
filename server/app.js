@@ -15,16 +15,6 @@ var sess = {
   cookie: {},
 };
 
-if (app.get("env") === "production") {
-  console.log("Production mode.  Trusting proxy, requiring secure cookies.");
-  app.set("trust proxy", 1); // trust first proxy
-  sess.cookie.secure = true; // serve secure cookies
-
-  app.use((req, res, next) => {
-    res.sendFile(path.join(__dirname, "..", "build", "index.html"));
-  });
-}
-
 app.use(session(sess));
 
 // Allow serving the react app on prod
@@ -47,5 +37,17 @@ app.use("/auth", authRouter);
 
 const apiRouter = require("./routes/api");
 app.use("/api", apiRouter);
+
+if (app.get("env") === "production") {
+  console.log("Production mode.  Trusting proxy, requiring secure cookies.");
+  app.set("trust proxy", 1); // trust first proxy
+  sess.cookie.secure = true; // serve secure cookies
+
+  app.use(express.static(path.join(__dirname, "..", "build")));
+  app.use(express.static(path.join(__dirname, "..", "public")));
+  app.use((req, res, next) => {
+    res.sendFile(path.join(__dirname, "..", "build", "index.html"));
+  });
+}
 
 module.exports = app;
