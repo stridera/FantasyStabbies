@@ -19,7 +19,7 @@ class User extends DBErrors(Model) {
         username: { type: "string", title: "The users username. Must be unique.", examples: ["stridera"] },
         reddit_id: { type: "string", title: "The users reddit ID.", examples: ["abc123"] },
         is_moderator: { type: "boolean", title: "Is the user a moderator." },
-        reddit_created: { type: "timestamp", title: "The date the users reddit account was created." },
+        // reddit_created: { type: "integer", title: "The date the users reddit account was created." },
       },
     };
   }

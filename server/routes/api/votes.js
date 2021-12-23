@@ -74,7 +74,6 @@ router.patch("/", ensureAccountOldEnough, ensureWeAreInTheVotingPhase, async (re
     //   .patch("nomination", req.nomination.id)
     //   .where("vote.id", "=", Category.query().select("vote").where("id", req.body.id));
     const results = await Category.query().select("vote").where("id", req.body.id);
-    console.log(results);
     return res.send({ success: true });
   } catch (err) {
     console.log(err);

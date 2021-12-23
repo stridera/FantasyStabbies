@@ -11,14 +11,11 @@ const pg = require("./db");
 var sess = {
   secret: process.env.SESSION_SECRET || "snoo fantasy stabbies",
   resave: false,
-  saveUninitialized: false,
-  cookie: {},
+  saveUninitialized: true,
+  cookie: { secure: app.get("env") === "production" ? true : false },
 };
 
 app.use(session(sess));
-
-// Allow serving the react app on prod
-app.use(express.static(path.join(__dirname, "..", "build")));
 
 // Body parser middleware
 app.use(express.json());
@@ -41,7 +38,6 @@ app.use("/api", apiRouter);
 if (app.get("env") === "production") {
   console.log("Production mode.  Trusting proxy, requiring secure cookies.");
   app.set("trust proxy", 1); // trust first proxy
-  sess.cookie.secure = true; // serve secure cookies
 
   app.use(express.static(path.join(__dirname, "..", "build")));
   app.use(express.static(path.join(__dirname, "..", "public")));

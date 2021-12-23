@@ -14,8 +14,6 @@ const RedditAuth = (passport) => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           const existingUser = await User.query().where("reddit_id", profile.id).first();
-
-          // const isUserModerator = await isMod(profile.name);
           const isUserModerator = isMod(profile.name);
 
           if (existingUser) {
@@ -29,13 +27,15 @@ const RedditAuth = (passport) => {
 
           // We don't have a user record with this ID, make a new record.
           // This is only stored to match votes to a name.
-          console.log("Saving new user.  Is moderator?  ", isUserModerator);
+          const ip_address = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+          console.log(`Saving new user ${profile.name}. IP: ${ip_address}.  Is moderator? ${isUserModerator}`);
           const user = await User.query().insert({
             username: profile.name,
             reddit_id: profile.id,
-            // iconURL: profile.icon_img,
             is_moderator: isUserModerator,
             reddit_created: new Date(profile._json.created_utc * 1000),
+            // iconURL: profile.icon_img,
           });
           done(null, user);
         } catch (err) {
