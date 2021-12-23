@@ -26,7 +26,7 @@ var sess = {
   cookie: { secure: app.get("env") === "production" ? true : false },
 };
 
-app.use(session(sess, store));
+app.use(session(sess));
 
 // Body parser middleware
 app.use(express.json());
