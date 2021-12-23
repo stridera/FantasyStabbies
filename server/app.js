@@ -19,6 +19,7 @@ const store = new KnexSessionStore({
 });
 
 var sess = {
+  store: store,
   secret: process.env.SESSION_SECRET || "snoo fantasy stabbies",
   resave: false,
   saveUninitialized: true,
