@@ -25,6 +25,7 @@
     "@reduxjs/toolkit": "^1.7.1",
     "axios": "^0.24.0",
     "camaro": "^6.1.0",
+    "connect-session-knex": "^2.1.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^10.0.0",

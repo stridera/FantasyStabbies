@@ -1,7 +1,9 @@
 require("dotenv").config();
 
 const express = require("express");
-const session = require("express-session"); // Need to store state var for reddit auth
+const session = require("express-session");
+const KnexSessionStore = require("connect-session-knex")(session);
+
 const app = express();
 const path = require("path");
 
@@ -10,7 +12,11 @@ const morgan = require("morgan");
 const winston = require("./services/winston");
 
 // Database
-const pg = require("./db");
+const knex = require("./db");
+
+const store = new KnexSessionStore({
+  knex,
+});
 
 var sess = {
   secret: process.env.SESSION_SECRET || "snoo fantasy stabbies",
@@ -19,7 +25,7 @@ var sess = {
   cookie: { secure: app.get("env") === "production" ? true : false },
 };
 
-app.use(session(sess));
+app.use(session(sess, store));
 
 // Body parser middleware
 app.use(express.json());
