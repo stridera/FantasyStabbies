@@ -2,8 +2,7 @@ const router = require("express").Router();
 
 const passport = require("passport");
 const crypto = require("crypto");
-
-const reddit_secret = crypto.createHash(process.env.SESSION_SECRET).toString("hex");
+const reddit_secret = crypto.createHash("sha256").update("blah blah blah").digest().toString("hex");
 
 router.route("/").get((req, res, next) => {
   // req.session.state = crypto.randomBytes(32).toString("hex");
