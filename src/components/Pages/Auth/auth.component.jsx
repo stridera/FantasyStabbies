@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 
 import Alert from "../../custom/Alert";
 import { Card, CardHeader, CardContent, Button, CircularProgress } from "@material-ui/core";
@@ -39,7 +39,7 @@ const useStyles = makeStyles({
 });
 
 const Auth = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
   const [error, setError] = useState("");
 
@@ -49,13 +49,13 @@ const Auth = () => {
       const from = location.state?.from?.pathname;
       if (from) {
         console.log("from", from);
-        history.push(location.state.from.pathname);
+        navigate(location.state.from.pathname);
       } else {
         console.log("logged in");
-        auth.isModerator ? history.push("/mod") : history.push("/campaign");
+        auth.isModerator ? navigate("/mod") : navigate("/campaign");
       }
     }
-  }, [auth, history, location.state]);
+  }, [auth, navigate, location.state]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);

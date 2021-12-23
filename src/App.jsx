@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import { ThemeProvider, createTheme } from "@material-ui/core/styles";
@@ -7,7 +7,7 @@ import { blueGrey } from "@material-ui/core/colors";
 
 import store from "./store/store";
 
-import Routes from "./components/routing/Routes";
+import BaseRoutes from "./components/routing/BaseRoutes";
 import { login } from "./store/auth.slice";
 import { getCampaigns } from "./store/entities/campaigns.slice";
 
@@ -31,7 +31,7 @@ const App = () => {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <Route component={Routes} />
+          <BaseRoutes />
         </BrowserRouter>
       </ThemeProvider>
     </Provider>

@@ -4,6 +4,7 @@ import moment from "moment";
 
 // Actions
 export const getCategoriesForCampaign = createAsyncThunk("categories/fetch", async (campaignId) => {
+  console.log(`Fetching categories for campaign: ${campaignId}`);
   const response = await campaignsService.getCategories(campaignId);
   return response.data;
 });

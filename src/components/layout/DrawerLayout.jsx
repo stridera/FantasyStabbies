@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -71,17 +71,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
+const ResponsiveDrawer = ({ title, campaigns, children }, ...rest) => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const classes = useStyles();
   const theme = useTheme();
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const auth = useSelector((state) => state.auth);
-  const campaigns = useSelector((state) => state.campaigns);
-  const { slug } = match.params;
+  const { slug } = useParams();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -93,17 +93,17 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
     );
     if (confirmed) {
       dispatch(deleteCampaignById(id));
-      if (redirectAfter) history.push("/campaign");
+      if (redirectAfter) navigate("/campaign");
     }
   };
 
-  useEffect(() => {
-    if (!auth.isAuthenticated) return history.push("/");
-    if (campaigns.loading) return;
+  // useEffect(() => {
+  //   if (auth.loaded && !auth.isAuthenticated) return navigate("/");
+  //   if (campaigns.loading) return;
 
-    const minSinceLastUpdate = moment().diff(moment(campaigns.lastUpdate), "minute");
-    if (minSinceLastUpdate > 1) dispatch(getCampaigns());
-  }, [auth.isAuthenticated, history, campaigns, dispatch]);
+  //   const minSinceLastUpdate = moment().diff(moment(campaigns.lastUpdate), "minute");
+  //   if (minSinceLastUpdate > 1) dispatch(getCampaigns());
+  // }, [auth.isAuthenticated, navigate, campaigns.lastUpdate, dispatch]);
 
   const drawer = (
     <div>
@@ -111,7 +111,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
       {auth.isModerator && (
         <>
           <List subheader={<ListSubheader>Moderators</ListSubheader>} className={classes.toolbar_bottom}>
-            <ListItem button component={Link} to={`/mod`} selected={match.path === "/mod"}>
+            <ListItem button component={Link} to={`/mod`} selected={location.pathname === "/mod"}>
               <ListItemIcon>
                 <ModIcon />
               </ListItemIcon>
@@ -122,7 +122,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
         </>
       )}
       <List subheader={<ListSubheader>Campaigns</ListSubheader>} className={classes.toolbar_bottom}>
-        <ListItem button component={Link} to="/campaign" key="campaigns" selected={match.path === "/campaign"}>
+        <ListItem button component={Link} to="/campaign" key="campaigns" selected={location.pathname === "/campaign"}>
           <ListItemIcon>
             <VoteIcon />
           </ListItemIcon>
@@ -140,18 +140,20 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
               <VoteIcon />
             </ListItemIcon>
             <ListItemText primary={campaign.name} />
-            <ListItemSecondaryAction>
-              {/* <IconButton aria-label="edit campaign" edge="end">
+            {auth.isModerator && (
+              <ListItemSecondaryAction>
+                {/* <IconButton aria-label="edit campaign" edge="end">
                   <EditIcon />
                 </IconButton> */}
-              <IconButton
-                aria-label="delete campaign"
-                edge="end"
-                onClick={() => deleteCampaign(campaign.id, slug === campaign.slug)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
+                <IconButton
+                  aria-label="delete campaign"
+                  edge="end"
+                  onClick={() => deleteCampaign(campaign.id, slug === campaign.slug)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            )}
           </ListItem>
         ))}
         {auth.isModerator && <CampaignDialog />}
@@ -169,7 +171,7 @@ const ResponsiveDrawer = ({ match, title, children }, ...rest) => {
           key="logout"
           onClick={() => {
             dispatch(logout());
-            history.push("/");
+            navigate("/");
           }}
         >
           <ListItemIcon>

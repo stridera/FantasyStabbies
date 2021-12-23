@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useHistory, Link } from "react-router-dom";
-import moment from "moment";
+import { useNavigate, useParams } from "react-router";
+import { Link } from "react-router-dom";
 import _ from "lodash";
+import { useSelector, useDispatch } from "react-redux";
 
 import {
   makeStyles,
@@ -19,7 +19,7 @@ import { Edit as EditIcon, Delete as DeleteIcon } from "@material-ui/icons";
 
 import AddCategory from "../../dialogs/Category.dialog";
 import { deleteCategoryFromCampaign, getCategoriesForCampaign } from "../../../store/entities/categories.slice";
-import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
+import { getCampaignBySlug, getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
 import { getNominations } from "../../../services/api.service";
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +29,11 @@ const useStyles = makeStyles((theme) => ({
   cardTitle: {
     fontSize: 14,
   },
+  box: {
+    backgroundColor: "#fff",
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(2),
+  },
   modActions: { display: "flex", marginLeft: "auto", color: "#ff0000" },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -36,49 +41,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CampaignDetailsComponent = ({ setTitle, campaign, categories, setError }) => {
+const CategoriesComponent = ({ setTitle, campaign, categories, setError }) => {
   const auth = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
   const deleteCategory = (id) => dispatch(deleteCategoryFromCampaign({ campaignId: campaign.id, categoryId: id }));
   const editCategory = (id) => dispatch(editCategoryFromCampaign(campaign.id, id));
 
-  useEffect(() => setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
-
   useEffect(() => {
-    const status = getCampaignStatus(campaign);
-    setStatus(status.status);
-    setStatusMsg(status.message);
+    const { status, message } = getCampaignStatus(campaign);
+    setTitle(`Campaign: ${campaign.name} | ${message}`);
+    setStatus(status);
+    setStatusMsg(message);
   }, [campaign]);
-
-  useEffect(() => {
-    if (campaign) {
-      dispatch(getCategoriesForCampaign(campaign.id)).then((data) => {
-        if (data.error) {
-          if (data.error.message === "Request failed with status code 403") {
-            dispatch(logout());
-            return history.push("/");
-          }
-          setError(data.error.message);
-        }
-      });
-    }
-  }, [dispatch, campaign]);
 
   const classes = useStyles();
 
   return (
     <>
-      <Box borderRadius={6} variant="outlined" className={classes.campaignState}>
-        <Typography variant="h4" component="h2" align="center">
-          {campaign.name}
-        </Typography>
-        <Typography variant="h5" component="h2" align="center">
-          {statusMsg}
-        </Typography>
-      </Box>
       {categories.entities.length > 0 ? (
         <Grid container spacing={2}>
           {_.map(categories.entities, (category) => (
@@ -119,16 +100,16 @@ const CampaignDetailsComponent = ({ setTitle, campaign, categories, setError }) 
           ))}
         </Grid>
       ) : (
-        <Box borderRadius={6} variant="outlined" className={classes.campaignState}>
+        <Box borderRadius={6} variant="outlined" className={classes.box}>
           <Typography variant="h5" component="h2" align="center">
-            No Categories. Add one to start.
+            No Categories Added! Moderators must add some to start the campaign.
           </Typography>
         </Box>
       )}
 
-      {auth.isModerator && <AddCategory campaign={campaign.id} />}
+      {auth.isModerator && campaign && <AddCategory campaign={campaign.id} />}
     </>
   );
 };
 
-export default CampaignDetailsComponent;
+export default CategoriesComponent;

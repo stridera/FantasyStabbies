@@ -12,13 +12,19 @@ import {
   CardActions,
 } from "@material-ui/core";
 import { ArrowBackIos as BackIcon } from "@material-ui/icons";
-import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
-import { useHistory } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import NominationCard from "../../custom/NominationCard";
 import AddNominationDialog from "../../dialogs/Nomination.dialog";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  getCampaignBySlug,
+  getCampaigns,
+  getCampaignStatus,
+  statusStates,
+} from "../../../store/entities/campaigns.slice";
 import { getNominationsForCategory } from "../../../store/entities/nominations.slice";
+import { getCategoriesForCampaign, getCategoryById } from "../../../store/entities/categories.slice";
 
 const refreshInterval = 60000;
 
@@ -32,68 +38,57 @@ const useStyles = makeStyles((theme) => ({
   },
   categoryTitle: { justifyContent: "right" },
 }));
-const CategoryComponent = ({ setTitle, campaign, category }) => {
-  const history = useHistory();
+
+const NominationComponent = ({ campaign, category, setTitle, setError }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [status, setStatus] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const nominations = useSelector((state) => state.nominations.entities);
 
-  useEffect(() => {
-    const status = getCampaignStatus(campaign);
-    setStatus(status.status);
-    setStatusMsg(status.message);
-  }, [campaign]);
-
   const updateNominations = useCallback(() => {
     if (campaign && category) {
-      console.log({ campaign, category });
+      console.log("Loading Nominations.", { campaign, category });
       dispatch(getNominationsForCategory({ campaignId: campaign.id, categoryId: category.id })).then((data) => {
         if (data.error) {
-          if (data.error.message === "Request failed with status code 403") {
+          if (data.error.message === "Request failed with code 403") {
             dispatch(logout());
-            return history.push("/");
+            return navigate("/");
           }
           setError(data.error.message);
         }
       });
     }
-  }, [dispatch, campaign, category, history]);
+  }, [dispatch, campaign, category, navigate]);
 
   useEffect(() => {
-    updateNominations();
     const interval = setInterval(() => {
       updateNominations();
     }, refreshInterval);
     return () => clearInterval(interval);
   }, [updateNominations]);
 
-  useEffect(() => setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
+  useEffect(() => campaign && setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
 
-  useEffect(() => {
-    console.log(nominations);
-  }, [nominations]);
-
-  console.log(nominations);
   const classes = useStyles();
-  return (
+  return campaign && category ? (
     <>
       <Box borderRadius={6} variant="outlined" key={category.id} className={classes.category}>
         <IconButton
           aria-label="back to campaign"
-          onClick={() => history.push(`/campaign/${campaign.slug}`)}
+          onClick={() => navigate(`/campaign/${campaign.slug}`)}
           className="backButton"
         >
           <BackIcon />
         </IconButton>
         <Typography variant="h5" component="h2" className={classes.categoryTitle}>
-          {category.title}
+          {category ? category.title : "Loading.."}
         </Typography>
       </Box>
       <Box borderRadius={6} variant="outlined" className={classes.category}>
         <Typography variant="h6" component="h2" className={classes.categoryTitle}>
-          {category.description}
+          {category && category.description}
         </Typography>
       </Box>
       <Grid container spacing={2}>
@@ -127,7 +122,9 @@ const CategoryComponent = ({ setTitle, campaign, category }) => {
       </Grid>
       <AddNominationDialog category={category} dialogOpen={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
+  ) : (
+    <Box>Loading...</Box>
   );
 };
 
-export default CategoryComponent;
+export default NominationComponent;

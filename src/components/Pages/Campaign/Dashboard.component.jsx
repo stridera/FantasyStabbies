@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { makeStyles, Grid, Box, Typography } from "@material-ui/core";
 import { getCampaignStatus } from "../../../store/entities/campaigns.slice";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   content: {},
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Dashboard = ({ setTitle, campaigns }) => {
+const Dashboard = ({ campaigns, setTitle }) => {
   useEffect(() => setTitle("Campaigns"), [setTitle]);
 
   const classes = useStyles();

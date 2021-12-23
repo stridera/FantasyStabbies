@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import * as campaignsService from "../../services/api.service";
 import moment from "moment";
+import { get } from "lodash";
 
 export const statusStates = {
   waiting: "waiting",
@@ -10,8 +11,9 @@ export const statusStates = {
 };
 
 export const getCampaigns = createAsyncThunk("campaigns/fetch", async () => {
-  const response = await campaignsService.getCampaigns();
-  return response.data;
+  console.log("fetching campaigns");
+  const { data } = await campaignsService.getCampaigns();
+  return data;
 });
 
 export const createCampaign = createAsyncThunk("campaign/create", async (data, { rejectWithValue }) => {
@@ -39,7 +41,11 @@ const campaignsSlice = createSlice({
     currentRequestId: undefined,
     lastUpdate: 0,
   },
-  reducers: {},
+  reducers: {
+    default: (state, action) => {
+      state.error = action.payload;
+    },
+  },
   extraReducers: {
     // Get
     [getCampaigns.pending]: (state, action) => {
