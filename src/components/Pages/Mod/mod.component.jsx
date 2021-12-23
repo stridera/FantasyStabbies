@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import { makeStyles, Container, Grid, Paper } from "@material-ui/core";
+import DrawerLayout from "../../layout/DrawerLayout";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,28 +28,30 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Mod = ({ setTitle }) => {
-  useEffect(() => {
-    setTitle("Moderator Dashboard");
-  }, [setTitle]);
+  const campaigns = useSelector((state) => state.campaigns);
 
   const classes = useStyles();
   return (
     <main className={classes.content}>
       <Container maxWidth="lg" className={classes.container}>
-        <Grid container spacing={3}>
-          {/* Chart */}
-          <Grid item xs={12} md={8} lg={9}>
-            <Paper className={classes.paper}>Blah</Paper>
+        <DrawerLayout title={"Moderator Dashboard"} campaigns={campaigns}>
+          <Grid container spacing={3}>
+            {/* Chart */}
+            <Grid item xs={12} md={8} lg={9}>
+              <Paper className={classes.paper}>
+                Moderator View here. Will show stats on campaigns, including votes and progress.
+              </Paper>
+            </Grid>
+            {/* Recent Deposits */}
+            <Grid item xs={12} md={4} lg={3}>
+              <Paper className={classes.paper}>Blah</Paper>
+            </Grid>
+            {/* Recent Orders */}
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>Blah</Paper>
+            </Grid>
           </Grid>
-          {/* Recent Deposits */}
-          <Grid item xs={12} md={4} lg={3}>
-            <Paper className={classes.paper}>Blah</Paper>
-          </Grid>
-          {/* Recent Orders */}
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>Blah</Paper>
-          </Grid>
-        </Grid>
+        </DrawerLayout>
       </Container>
     </main>
   );

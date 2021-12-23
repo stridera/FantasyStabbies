@@ -43,9 +43,7 @@ const BaseRoutes = () => {
         path="/mod"
         element={
           <ModeratorOutlet>
-            <Drawer title="Moderator">
-              <Mod title={title} setTitle={setTitle} />
-            </Drawer>
+            <Mod title={title} setTitle={setTitle} />
           </ModeratorOutlet>
         }
       />
