@@ -28,10 +28,10 @@ class Campaign extends DBErrors(Model) {
         slug: { type: "string", title: "The slug, typically generated from the name.", examples: ["2020_stabbies"] },
         public: { type: "boolean", title: "Is the campaign public (or mod only)." },
         min_account_age: { type: "integer", title: "The minimum age for the reddit account in days" },
-        nominate_start_date: { type: "timestamp", title: "The date to start taking nominations" },
-        nominate_end_date: { type: "timestamp", title: "The date to start taking nominations" },
-        voting_start_date: { type: "timestamp", title: "The date to stop nominations and start voting" },
-        voting_end_date: { type: "timestamp", title: "The date to end voting" },
+        // nominate_start_date: { type: "timestamp", title: "The date to start taking nominations" },
+        // nominate_end_date: { type: "timestamp", title: "The date to start taking nominations" },
+        // voting_start_date: { type: "timestamp", title: "The date to stop nominations and start voting" },
+        // voting_end_date: { type: "timestamp", title: "The date to end voting" },
       },
     };
   }

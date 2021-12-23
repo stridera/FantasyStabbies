@@ -32,7 +32,8 @@ describe("Get Categories", () => {
         .get(`/api/campaigns/10005/category`)
         .set(authMock(false))
         .expect(200);
-      expect(categories.length).toBe(1);
+      expect(categories.campaign).toBe(10005);
+      expect(categories.categories.length).toBe(1);
     });
   });
 
@@ -42,7 +43,8 @@ describe("Get Categories", () => {
         .get(`/api/campaigns/10001/category`)
         .set(authMock(true))
         .expect(200);
-      expect(categories.length).toBe(1);
+      expect(categories.campaign).toBe(10001);
+      expect(categories.categories.length).toBe(1);
     });
 
     it("should return a 404 if the campaign does not exist", async () => {
@@ -81,10 +83,11 @@ describe("Create Categories", () => {
         .set(authMock(true))
         .send({
           title: "Category Creation Test",
-          type: "novel",
+          source: "novel",
         })
         .expect(201);
-      expect(category.id).toBe(1);
+      expect(category.campaign).toBe(10005);
+      expect(category.category.id).toBe(1);
     });
 
     it("should not be able to create a category with a duplicate title", async () => {
@@ -93,7 +96,7 @@ describe("Create Categories", () => {
         .set(authMock(true))
         .send({
           title: "Category Creation Test",
-          type: "novel",
+          source: "novel",
         })
         .expect(409);
       expect(category.error).toBe("Category already exists.");

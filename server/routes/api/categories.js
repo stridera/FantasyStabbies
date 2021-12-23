@@ -37,11 +37,11 @@ router.post("/", ensureModerator, async (req, res, next) => {
       .validate(req.body)
       .then(async (data) => {
         const campaign = req.campaign;
-        const categories = await Category.query().insert({
+        const category = await Category.query().insert({
           ...data,
           campaign: campaign.id,
         });
-        return res.status(201).send({ campaign: campaign.id, categories });
+        return res.status(201).send({ campaign: campaign.id, category });
       })
       .catch((err) => {
         if (err instanceof UniqueViolationError) {
