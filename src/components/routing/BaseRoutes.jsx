@@ -54,7 +54,7 @@ const BaseRoutes = () => {
         element={
           <PrivateOutlet>
             <Routes>
-              <Route path=":slug/:categoryID" element={<CampaignComponent title={title} setTitle={setTitle} />} />
+              <Route path=":slug/:category_id" element={<CampaignComponent title={title} setTitle={setTitle} />} />
               <Route path=":slug" element={<CampaignComponent title={title} setTitle={setTitle} />} />
               <Route index element={<CampaignComponent title={title} setTitle={setTitle} />} />
             </Routes>

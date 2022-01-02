@@ -20,7 +20,7 @@ import {
 import { Add as AddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
 import { useSelector, useDispatch } from "react-redux";
-import allowedSources from "../../config/sources";
+import allowedSources from "../../config/allowedSources";
 import { createCategoryForCampaign } from "../../store/entities/categories.slice";
 import { categorySchema } from "../../config/validation.schema";
 
@@ -52,7 +52,7 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
 
   const onSubmit = (form) => {
     setSubmitted(true);
-    const data = { campaignId: campaign, ...form };
+    const data = { campagin_id: campaign, ...form };
     console.log("Submitting", data);
     dispatch(createCategoryForCampaign(data)).then((data) => {
       console.log("Request complete.", data);
@@ -124,7 +124,7 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
                     <Select {...field}>
                       {_.map(allowedSources, (value, key) => (
                         <MenuItem id={key} key={key} value={key}>
-                          {value}
+                          {value.text}
                         </MenuItem>
                       ))}
                     </Select>

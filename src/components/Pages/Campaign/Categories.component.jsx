@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import _ from "lodash";
 import { useSelector, useDispatch } from "react-redux";
@@ -34,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     padding: theme.spacing(2),
   },
-  modActions: { display: "flex", marginLeft: "auto", color: "#ff0000" },
+  modActions: { display: "flex", marginLeft: "auto", backgroundColor: "#ff0000" },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
@@ -43,10 +42,11 @@ const useStyles = makeStyles((theme) => ({
 
 const CategoriesComponent = ({ setTitle, campaign, categories, setError }) => {
   const auth = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
-  const deleteCategory = (id) => dispatch(deleteCategoryFromCampaign({ campaignId: campaign.id, categoryId: id }));
+  const deleteCategory = (id) => dispatch(deleteCategoryFromCampaign({ campagin_id: campaign.id, category_id: id }));
   const editCategory = (id) => dispatch(editCategoryFromCampaign(campaign.id, id));
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const CategoriesComponent = ({ setTitle, campaign, categories, setError }) => {
       {categories.entities.length > 0 ? (
         <Grid container spacing={2}>
           {_.map(categories.entities, (category) => (
-            <Grid item lg={3} key={category.id}>
+            <Grid item lg={4} key={category.id}>
               <Card className={classes.card}>
                 <CardContent>
                   <Typography className={classes.cardTitle} gutterBottom>

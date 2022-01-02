@@ -11,20 +11,19 @@ import {
   CardContent,
   CardActions,
 } from "@material-ui/core";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@material-ui/icons";
 import { ArrowBackIos as BackIcon } from "@material-ui/icons";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 
 import NominationCard from "../../custom/NominationCard";
 import AddNominationDialog from "../../dialogs/Nomination.dialog";
 import { useDispatch, useSelector } from "react-redux";
+import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
 import {
-  getCampaignBySlug,
-  getCampaigns,
-  getCampaignStatus,
-  statusStates,
-} from "../../../store/entities/campaigns.slice";
-import { getNominationsForCategory } from "../../../store/entities/nominations.slice";
-import { getCategoriesForCampaign, getCategoryById } from "../../../store/entities/categories.slice";
+  getNominationsForCategory,
+  removeVoteForNomination,
+  voteForNomination,
+} from "../../../store/entities/nominations.slice";
 
 const refreshInterval = 60000;
 
@@ -36,7 +35,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     backgroundColor: "#fff",
   },
-  categoryTitle: { justifyContent: "right" },
+  categoryTitle: {},
+  actionBlock: { display: "flex" },
+  actions: { marginRight: "auto" },
+  modActions: { marginLeft: "auto", backgroundColor: "#ff0000" },
 }));
 
 const NominationComponent = ({ campaign, category, setTitle, setError }) => {
@@ -46,11 +48,13 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
   const [statusMsg, setStatusMsg] = useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const nominations = useSelector((state) => state.nominations.entities);
+  const auth = useSelector((state) => state.auth);
+
+  // useEffect(() => campaign && setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
 
   const updateNominations = useCallback(() => {
-    if (campaign && category) {
-      console.log("Loading Nominations.", { campaign, category });
-      dispatch(getNominationsForCategory({ campaignId: campaign.id, categoryId: category.id })).then((data) => {
+    if (campaign && category && campaign.id === category.campaign) {
+      dispatch(getNominationsForCategory(category)).then((data) => {
         if (data.error) {
           if (data.error.message === "Request failed with code 403") {
             dispatch(logout());
@@ -63,13 +67,80 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
   }, [dispatch, campaign, category, navigate]);
 
   useEffect(() => {
+    const { status, message } = getCampaignStatus(campaign);
+    setStatus(status);
+    setStatusMsg(message);
     const interval = setInterval(() => {
       updateNominations();
     }, refreshInterval);
     return () => clearInterval(interval);
   }, [updateNominations]);
 
-  useEffect(() => campaign && setTitle(`Campaign: ${campaign.name} | ${statusMsg}`), [setTitle, campaign, statusMsg]);
+  const deleteNomination = (nomination) => {
+    dispatch(deleteNomination(nomination.id)).then((data) => {
+      if (data.error) {
+        if (data.error.message === "Request failed with code 403") {
+          dispatch(logout());
+          return navigate("/");
+        }
+        setError(data.error.message);
+      }
+    });
+  };
+
+  const addVote = (nomination) => {
+    dispatch(voteForNomination({ category, nomination })).then((data) => {
+      if (data.error) {
+        if (data.error.message === "Request failed with code 403") {
+          dispatch(logout());
+          return navigate("/");
+        }
+        setError(data.error.message);
+      }
+    });
+  };
+
+  const deleteVote = (nomination) => {
+    dispatch(removeVoteForNomination({ category, nomination })).then((data) => {
+      if (data.error) {
+        if (data.error.message === "Request failed with code 403") {
+          dispatch(logout());
+          return navigate("/");
+        }
+        setError(data.error.message);
+      }
+    });
+  };
+
+  const actions = (nomination) => {
+    return (
+      <Box className={classes.actionBlock}>
+        {(auth.isModerator || status === statusStates.voting) && (
+          <Box className={classes.actions}>
+            {nomination.voted ? (
+              <Button size="small" color="primary" onClick={() => deleteVote(nomination)}>
+                Voted!
+              </Button>
+            ) : (
+              <Button size="small" color="primary" onClick={() => addVote(nomination)}>
+                Vote
+              </Button>
+            )}
+          </Box>
+        )}
+        {auth.isModerator && (
+          <Box className={classes.modActions}>
+            {/* <IconButton aria-label="edit nomination" onClick={() => editNomination(nominationId)}>
+            <EditIcon />
+          </IconButton> */}
+            <IconButton aria-label="delete nomination" onClick={() => deleteNomination(nomination.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        )}
+      </Box>
+    );
+  };
 
   const classes = useStyles();
   return campaign && category ? (
@@ -86,37 +157,32 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
           {category ? category.title : "Loading.."}
         </Typography>
       </Box>
-      <Box borderRadius={6} variant="outlined" className={classes.category}>
-        <Typography variant="h6" component="h2" className={classes.categoryTitle}>
-          {category && category.description}
-        </Typography>
-      </Box>
       <Grid container spacing={2}>
         <Grid item lg={3}>
-          <Card className={classes.card}>
-            <CardActionArea>
-              <CardContent className={classes.cardContent}>
-                <Typography gutterBottom variant="h5" component="h2">
-                  Add a nomination.
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  This is your chance to nominate your favorite.
-                </Typography>
-              </CardContent>
-            </CardActionArea>
-            <CardActions>
-              <Button size="small" color="primary" onClick={() => setDialogOpen(true)}>
-                Add Nomination
-              </Button>
-            </CardActions>
-          </Card>
+          {(auth.isModerator || status === statusStates.nominating) && (
+            <Card className={classes.card}>
+              <CardActionArea>
+                <CardContent className={classes.cardContent}>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    Add a nomination.
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" component="p">
+                    This is your chance to nominate your favorite.
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+              <CardActions>
+                <Button size="small" color="primary" onClick={() => setDialogOpen(true)}>
+                  Add Nomination
+                </Button>
+              </CardActions>
+            </Card>
+          )}
         </Grid>
         {nominations &&
           nominations.map((nomination) => (
             <Grid item lg={3} key={nomination.id}>
-              <Card className={classes.card}>
-                <NominationCard nomination={nomination} />
-              </Card>
+              <NominationCard nomination={nomination} actions={actions} />
             </Grid>
           ))}
       </Grid>

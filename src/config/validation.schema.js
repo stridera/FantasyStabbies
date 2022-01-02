@@ -33,18 +33,29 @@ const categorySchema = yup.object().shape({
 
 const nominationSchema = yup.object().shape({
   work: yup.number().positive().integer().required(),
+  approved: yup.boolean().isFalse(), // Should not be set by the user
+  approved_by: yup.boolean().isFalse(), // Should not be set by the user
 });
 
-const bookSchema = yup.object().shape({
-  google_book_id: yup.string().required().min(3).max(25),
-});
-
-const otherSchema = yup.object().shape({
+const workSchema = yup.object().shape({
+  source: yup.string().required().min(3).max(255),
   title: yup.string().required().min(3).max(255),
-  author: yup.string().min(3).max(255),
-  description: yup.string().min(3).max(255),
-  url: yup.string().url().required(),
+  authors: yup.string().required().min(3).max(255),
+  publisher: yup.string().min(3).max(255),
+  published_date: yup.date(),
+  source_url: yup.string().url().required(),
   image_url: yup.string().url(),
+  note: yup.string().min(3).max(255),
+});
+
+const redditUserSchema = yup.object().shape({
+  url: yup
+    .string()
+    .required()
+    .min(3)
+    .max(255)
+    .matches(/^(?:(?:https?):\/\/)?(?:www\.)?(?:reddit\.com)?(?:\/u(?:ser)?\/)?([a-z0-9]+)$/, "Enter correct url!")
+    .required("Please enter website"),
 });
 
 module.exports = {
@@ -52,6 +63,5 @@ module.exports = {
   updateCampaignSchema,
   categorySchema,
   nominationSchema,
-  bookSchema,
-  otherSchema,
+  workSchema,
 };

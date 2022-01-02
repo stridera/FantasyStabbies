@@ -11,8 +11,8 @@ const notFoundError = { status: 404, message: "Category not found." };
 router.get("/", async (req, res, next) => {
   try {
     const campaign = req.campaign;
-    const categories = await Category.query().where("campaign", campaign.id).select([]);
-    res.json({ campaign: campaign.id, categories });
+    const categories = await Category.query().where("campaign_id", campaign.id);
+    res.json({ campaign_id: campaign.id, categories });
   } catch (err) {
     next(err);
   }
@@ -22,7 +22,7 @@ router.get("/:id", async (req, res, next) => {
   try {
     const campaign = req.campaign;
     const category = await Category.query().findById(req.params.id);
-    if (category && category.campaign === campaign.id) {
+    if (category && category.campaign_id === campaign.id) {
       res.json(category);
     }
     next(notFoundError);
@@ -39,9 +39,9 @@ router.post("/", ensureModerator, async (req, res, next) => {
         const campaign = req.campaign;
         const category = await Category.query().insert({
           ...data,
-          campaign: campaign.id,
+          campaign_id: campaign.id,
         });
-        return res.status(201).send({ campaign: campaign.id, category });
+        return res.status(201).send({ campaign_id: campaign.id, category });
       })
       .catch((err) => {
         if (err instanceof UniqueViolationError) {
@@ -85,7 +85,7 @@ router.use(
   async (req, res, next) => {
     try {
       const campaign = req.campaign;
-      const category = await Category.query().findById(req.params.id).where("campaign", campaign.id);
+      const category = await Category.query().findById(req.params.id).where("campaign_id", campaign.id);
       if (category) {
         req.category = category;
         return next();

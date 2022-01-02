@@ -58,7 +58,7 @@ if (app.get("env") === "production") {
 }
 
 // Log requests
-app.use(morgan("combined", { stream: winston.stream }));
+if (app.get("env") !== "test") app.use(morgan("combined", { stream: winston.stream }));
 
 // Log server errors
 app.use((err, req, res, next) => {
@@ -67,6 +67,7 @@ app.use((err, req, res, next) => {
     return next(err);
   }
 
+  // console.error(err);
   if (app.get("env") !== "test") winston.error(err.message, { url: req.originalUrl });
   res.status(err.status || 500);
   res.json({ error: err.message });

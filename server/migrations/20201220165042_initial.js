@@ -16,13 +16,6 @@ exports.up = async (knex) => {
     table.timestamps(true, true);
   });
 
-  await knex.schema.createTable(tableNames.approver, (table) => {
-    table.increments("id");
-    table.string("type").notNullable();
-    table.string("approver").notNullable();
-    table.timestamps(true, true);
-  });
-
   await knex.schema.createTable(tableNames.campaign, (table) => {
     table.increments("id");
     table.string("name").notNullable().unique();
@@ -38,11 +31,11 @@ exports.up = async (knex) => {
 
   await knex.schema.createTable(tableNames.category, (table) => {
     table.increments("id");
-    table.integer("campaign").unsigned().notNullable().references("id").inTable(tableNames.campaign);
+    table.integer("campaign_id").unsigned().notNullable().references("id").inTable(tableNames.campaign);
     table.string("title", 255).notNullable();
     table.string("description", 255);
     table.string("source", 255).notNullable();
-    table.unique(["campaign", "title"]);
+    table.unique(["campaign_id", "title"]);
     table.timestamps(true, true);
   });
 
@@ -50,34 +43,34 @@ exports.up = async (knex) => {
     table.increments("id");
     table.string("google_book_id", 25).unique();
     table.string("title", 255).notNullable();
-    table.string("authors", 255).notNullable();
+    table.string("authors", 255);
     table.string("publisher", 255);
     table.string("published_date", 255);
     table.string("source", 255);
-    table.string("source_url", 2000).notNullable().unique();
+    table.string("source_url", 2000).notNullable();
     table.string("image_url", 2000);
     table.string("note", 2000);
-    table.boolean("is_valid").defaultTo(false);
-    table.integer("approved_by").unsigned().references("id").inTable(tableNames.user);
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable(tableNames.nomination, (table) => {
     table.increments("id");
-    table.integer("user").unsigned().notNullable().references("id").inTable(tableNames.user);
-    table.integer("category").unsigned().notNullable().references("id").inTable(tableNames.category);
-    table.integer("work").unsigned().notNullable().references("id").inTable(tableNames.work);
-    table.unique(["user", "category", "work"]);
+    table.integer("user_id").unsigned().notNullable().references("id").inTable(tableNames.user);
+    table.integer("category_id").unsigned().notNullable().references("id").inTable(tableNames.category);
+    table.integer("work_id").unsigned().notNullable().references("id").inTable(tableNames.work);
+    table.boolean("approved").defaultTo(false);
+    table.integer("approved_by").unsigned().references("id").inTable(tableNames.user);
+    table.unique(["user_id", "category_id", "work_id"]);
     table.timestamps(true, true);
   });
 
   await knex.schema.createTable(tableNames.vote, (table) => {
     table.increments("id");
-    table.integer("user").unsigned().notNullable().references("id").inTable(tableNames.user);
-    table.integer("nomination").unsigned().notNullable().references("id").inTable(tableNames.nomination);
+    table.integer("user_id").unsigned().notNullable().references("id").inTable(tableNames.user);
+    table.integer("nomination_id").unsigned().notNullable().references("id").inTable(tableNames.nomination);
     table.string("ip_address", 255).notNullable();
     table.timestamps(true, true);
-    table.unique(["user", "nomination"]);
+    table.unique(["user_id", "nomination_id"]);
   });
 };
 

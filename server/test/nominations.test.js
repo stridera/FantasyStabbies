@@ -87,8 +87,8 @@ describe("Create new nominations", () => {
         .send({ work: 10002 })
         .expect(201);
       const expected = await knex(tableNames.nomination).where({ id: nomination.id }).first();
-      expect(expected.user).toEqual(10001);
-      expect(expected.work).toBe(10002);
+      expect(expected.user_id).toEqual(10001);
+      expect(expected.work_id).toBe(10002);
     });
     it("should not be able to add duplicate nominations for moderators", async () => {
       const { body: nomination } = await request(app)
@@ -123,8 +123,8 @@ describe("Create new nominations", () => {
         .send({ work: 10003 })
         .expect(201);
       const expected = await knex(tableNames.nomination).where({ id: nomination.id }).first();
-      expect(expected.user).toEqual(10001);
-      expect(expected.work).toBe(10003);
+      expect(expected.user_id).toEqual(10001);
+      expect(expected.work_id).toBe(10003);
     });
     it("should not be able to add nominations for non-moderators under min_account_age", async () => {
       const { body: nomination } = await request(app)
@@ -134,7 +134,30 @@ describe("Create new nominations", () => {
         .expect(400);
       expect(nomination.error).toBe("Your account is too young to participate in this campaign.");
     });
+
+    it("Should not allow a nomination to be created with approved set to true", async () => {
+      await request(app)
+        .post("/api/campaigns/10006/category/10003/nominations/")
+        .set(authMock(false))
+        .send({
+          work: 10004,
+          approved: true,
+        })
+        .expect(400);
+    });
+
+    it("Should be auto-approved if the creator is a moderator", async () => {
+      const { body: nomination } = await request(app)
+        .post("/api/campaigns/10006/category/10003/nominations/")
+        .set(authMock(true, 10001))
+        .send({ work: 10004 })
+        .expect(201);
+      const expected = await knex(tableNames.nomination).where({ id: nomination.id }).first();
+      expect(expected.approved).toBe(true);
+      expect(expected.approved_by).toBe(10001);
+    });
   });
+
   describe("After Nomination Phase", () => {
     it("should return a 404 for private campaigns for non-moderator", async () => {
       const { body: nomination } = await request(app)
@@ -143,6 +166,7 @@ describe("Create new nominations", () => {
         .send({ work: 10003 })
         .expect(404);
     });
+
     it("should be unable to create new nominations for non-moderators", async () => {
       const { body: nomination } = await request(app)
         .post("/api/campaigns/10007/category/10004/nominations/")
@@ -158,8 +182,8 @@ describe("Create new nominations", () => {
         .send({ work: 10003 })
         .expect(201);
       const expected = await knex(tableNames.nomination).where({ id: nomination.id }).first();
-      expect(expected.user).toEqual(10001);
-      expect(expected.work).toBe(10003);
+      expect(expected.user_id).toEqual(10001);
+      expect(expected.work_id).toBe(10003);
     });
   });
 });

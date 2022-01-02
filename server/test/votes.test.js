@@ -23,6 +23,13 @@ describe("Get Votes", () => {
         .expect(200);
       expect(vote.voted).toBe(true);
     });
+    it("Should be able to delete thier own vote", async () => {
+      const { body: vote } = await request(app)
+        .get("/api/campaigns/10007/category/10004/nominations/10004/vote")
+        .set(authMock(false, 10006))
+        .expect(200);
+      expect(vote.voted).toBe(true);
+    });
     it("Should not return all votes with user details", async () => {
       await request(app)
         .get("/api/campaigns/10005/category/10002/nominations/10002/vote/show")
@@ -71,9 +78,9 @@ describe("Delete Votes", () => {
   describe("As User", () => {
     it("Should be able to delete thier own vote", async () => {
       const { body: response } = await request(app)
-        .delete("/api/campaigns/10005/category/10002/nominations/10002/vote")
-        .set(authMock(false, 10005))
-        .expect(200);
+        .delete("/api/campaigns/10007/category/10004/nominations/10004/vote")
+        .set(authMock(false, 10006));
+      // .expect(200);
       expect(response.success).toBe(true);
     });
   });

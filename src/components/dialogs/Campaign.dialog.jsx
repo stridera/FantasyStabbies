@@ -25,7 +25,7 @@ import { AddLocation as VoteAddIcon } from "@material-ui/icons";
 import Alert from "../custom/Alert";
 
 import { createCampaign } from "../../store/entities/campaigns.slice";
-import { campaignSchema } from "../../config/validation.schema";
+import { campaignSchema } from "../../../src/config/validation.schema";
 
 const useStyles = makeStyles((theme) => ({
   form: {

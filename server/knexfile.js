@@ -19,7 +19,7 @@ module.exports = {
   development: {
     client: "pg",
     connection: process.env.DATABASE_URL,
-    debug: true,
+    debug: false,
   },
   production: {
     client: "pg",

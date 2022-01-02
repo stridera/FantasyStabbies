@@ -26,8 +26,8 @@ export const createCampaign = createAsyncThunk("campaign/create", async (data, {
   }
 });
 
-export const deleteCampaign = createAsyncThunk("campaign/delete", async (campaignId) => {
-  const response = await campaignsService.deleteCampagin(campaignId);
+export const deleteCampaign = createAsyncThunk("campaign/delete", async (campagin_id) => {
+  const response = await campaignsService.deleteCampagin(campagin_id);
   return response.data;
 });
 

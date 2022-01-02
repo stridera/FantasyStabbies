@@ -1,23 +1,32 @@
-const addDevUser = (req) => {
+const User = require("../models/user.model");
+
+const addDevUser = async (req) => {
+  if (req.user) return;
   if (["dev", "test"].includes(process.env.ENV) && req.headers.authorization == `Bearer ${process.env.DEV_TOKEN}`) {
     const is_moderator = req.headers["x-is-moderator"] == "true";
-    if (process.env.ENV == "dev") console.log(`Mocking User.  Mod: ${is_moderator ? "true" : "false"}`);
-    if (!req.user) {
-      req.user = {
-        username: `dev_${is_moderator ? "moderator" : "user"}`,
-        id: parseInt(req.headers["x-user-id"]) || 10001,
-        reddit_id: "4aulo",
-        is_moderator: is_moderator,
-        reddit_created: req.headers["x-reddit-created"] || "2020-08-11T16:30:38.564Z",
-        loading: false,
-        error: null,
-      };
+    const reddit_id = `dev_${is_moderator ? "moderator" : "user"}`;
+    const data = {
+      id: parseInt(req.headers["x-user-id"]) || 10001,
+      username: reddit_id,
+      reddit_id: reddit_id,
+      is_moderator: is_moderator,
+      reddit_created: req.headers["x-reddit-created"] || "2020-08-11T16:30:38.564Z",
+    };
+
+    if (process.env.ENV == "dev") {
+      req.user = await User.query().where("reddit_id", reddit_id).first();
+      if (!req.user) {
+        req.user = await User.query().insert(data);
+      }
+    } else {
+      // Test Env
+      req.user = data;
     }
   }
 };
 
-const ensureAuthenticated = (req, res, next) => {
-  addDevUser(req);
+const ensureAuthenticated = async (req, res, next) => {
+  await addDevUser(req);
 
   if (req.isAuthenticated()) {
     return next();
@@ -26,8 +35,8 @@ const ensureAuthenticated = (req, res, next) => {
   }
 };
 
-const ensureModerator = (req, res, next) => {
-  addDevUser(req);
+const ensureModerator = async (req, res, next) => {
+  await addDevUser(req);
 
   if (req.isAuthenticated() && req.user && req.user.is_moderator) {
     return next();

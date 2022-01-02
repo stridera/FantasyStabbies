@@ -39,12 +39,12 @@ const useStyles = makeStyles((theme) => ({
 
 const CampaignsComponent = ({ title, setTitle }) => {
   const dispatch = useDispatch();
-  const { slug, categoryID } = useParams();
+  const { slug, category_id } = useParams();
 
   const campaigns = useSelector((state) => state.campaigns);
   const campaign = useSelector((state) => getCampaignBySlug(slug)(state));
   const categories = useSelector((state) => state.categories);
-  const category = useSelector((state) => getCategoryById(parseInt(categoryID))(state));
+  const category = useSelector((state) => getCategoryById(parseInt(category_id))(state));
 
   const [campaignStatus, setCampaignStatus] = useState("");
   const [error, setError] = useState("");
@@ -58,14 +58,14 @@ const CampaignsComponent = ({ title, setTitle }) => {
   }, [slug, campaign]);
 
   useEffect(() => {
-    campaign && category && dispatch(getNominationsForCategory({ campaignId: campaign.id, categoryId: category.id }));
+    campaign && category && dispatch(getNominationsForCategory(category));
   }, [campaign, category]);
 
   let renderComponent;
 
   if (slug) {
     if (campaign) {
-      if (categoryID) {
+      if (category_id) {
         renderComponent = category ? (
           <NominationComponent setTitle={setTitle} campaign={campaign} category={category} setError={setError} />
         ) : (

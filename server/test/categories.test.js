@@ -32,7 +32,7 @@ describe("Get Categories", () => {
         .get(`/api/campaigns/10005/category`)
         .set(authMock(false))
         .expect(200);
-      expect(categories.campaign).toBe(10005);
+      expect(categories.campaign_id).toBe(10005);
       expect(categories.categories.length).toBe(1);
     });
   });
@@ -43,7 +43,7 @@ describe("Get Categories", () => {
         .get(`/api/campaigns/10001/category`)
         .set(authMock(true))
         .expect(200);
-      expect(categories.campaign).toBe(10001);
+      expect(categories.campaign_id).toBe(10001);
       expect(categories.categories.length).toBe(1);
     });
 
@@ -86,7 +86,7 @@ describe("Create Categories", () => {
           source: "novel",
         })
         .expect(201);
-      expect(category.campaign).toBe(10005);
+      expect(category.campaign_id).toBe(10005);
       expect(category.category.id).toBe(1);
     });
 

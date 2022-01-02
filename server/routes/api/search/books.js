@@ -1,11 +1,11 @@
 const router = require("express").Router();
-const CacheService = require("../../services/caching");
-const GoogleBooks = require("../../services/googlebooks");
+const CacheService = require("../../../services/caching");
+const GoogleBooks = require("../../../services/googlebooks");
 
 const ttl = 60 * 60 * 1 * 24; // cache for 1 Day
 const cache = new CacheService(ttl); // Create a new cache service instance
 
-router.get("/search/:query", async (req, res, next) => {
+router.get("/search/books/:query", async (req, res, next) => {
   try {
     const query = req.params.query;
     const cache_key = `search_${query}`;
@@ -23,7 +23,7 @@ router.get("/search/:query", async (req, res, next) => {
   }
 });
 
-router.get("/id/:query", async (req, res, next) => {
+router.get("/search/id/:query", async (req, res, next) => {
   try {
     const query = req.params.query;
     const cache_key = `book_${query}`;
@@ -40,5 +40,4 @@ router.get("/id/:query", async (req, res, next) => {
     return next(err);
   }
 });
-
 module.exports = router;

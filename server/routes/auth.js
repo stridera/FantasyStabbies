@@ -4,8 +4,8 @@ const { addDevUser } = require("../middleware/auth.middleware");
 const reddit = require("./auth/reddit");
 router.use("/reddit", reddit);
 
-router.get("/user", (req, res) => {
-  addDevUser(req);
+router.get("/user", async (req, res) => {
+  await addDevUser(req);
 
   if (req.user) {
     return res.send(req.user);

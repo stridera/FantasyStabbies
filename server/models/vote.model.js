@@ -11,11 +11,11 @@ class Vote extends DBErrors(Model) {
   static get jsonSchema() {
     return {
       type: "object",
-      required: ["nomination", "user"],
+      required: ["nomination_id", "user_id"],
       properties: {
         id: { type: "integer" },
-        nomination: { type: "integer" },
-        user: { type: "integer" },
+        nomination_id: { type: "integer" },
+        user_id: { type: "integer" },
       },
     };
   }

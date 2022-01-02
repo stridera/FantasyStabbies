@@ -1,56 +1,68 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, TextField, Grid, makeStyles } from "@material-ui/core";
-import { throttle } from "lodash";
+import React, { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, makeStyles, Typography } from "@material-ui/core";
+import allowedSources from "../../config/allowedSources";
+import GoogleBooksSearch from "./search/GoogleBooksSearch";
+import ManualSearch from "./search/ManualSearch";
+import RedditFantasySearch from "./search/RedditFantasySearch";
+import RedditUserSearch from "./search/RedditUserSearch";
+import { createWork } from "../../store/entities/works.slice";
+import { createNominationInCategory } from "../../store/entities/nominations.slice";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({}));
+
 const AddNominationDialog = ({ category, dialogOpen, onClose }) => {
-  const type = category.source;
-  const [value, setValue] = useState(null);
-  const [inputValue, setInputValue] = useState("");
+  const dispatch = useDispatch();
+  const [source, setSource] = useState(category.source);
 
-  const throttleSearch = useMemo(
-    () =>
-      throttle((request, callback) => {
-        console.log("Throttled request:", request);
-        callback(request);
-      }, 1000),
-    []
-  );
-
-  const doSearch = (event) => {
-    throttleSearch(event.target.value, (results) => {
-      console.log("Callback", results);
-    });
+  const nominate = (book) => {
+    dispatch(createWork(book))
+      .then((data) => {
+        if (data.error) {
+          console.log("Error creating work: ", data.error);
+          // Todo: Set error message
+          return;
+        }
+        const work = data.payload;
+        dispatch(createNominationInCategory({ category, work }))
+          .then((data) => {
+            if (data.error) {
+              console.log("Error creating nomination: ", data.error);
+              return;
+            }
+            onClose();
+          })
+          .catch((err) => {
+            console.log("Error creating nomination", err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-  useEffect(() => {
-    if (inputValue.length > 2) {
-      doSearch(inputValue);
-    }
-  }, [inputValue]);
-
   const classes = useStyles();
-  return (
-    <Dialog onClose={onClose} aria-label="add nomination dialog" open={dialogOpen}>
-      <DialogTitle>Add Nomination</DialogTitle>
-      <DialogContent>
-        <Grid container alignItems="center">
-          <Grid item>
-            <TextField
-              id="search"
-              label="Search"
-              type="search"
-              variant="outlined"
-              fullWidth
-              helperText="Enter search terms or URL."
-              onChange={doSearch}
-            />
-          </Grid>
-          <Grid item xs></Grid>
-        </Grid>
-      </DialogContent>
-    </Dialog>
-  );
+  switch (source) {
+    case allowedSources.google_books.id:
+      return <GoogleBooksSearch onClose={onClose} dialogOpen={dialogOpen} setSource={setSource} nominate={nominate} />;
+    case allowedSources.manual.id:
+      return <ManualSearch onClose={onClose} dialogOpen={dialogOpen} setSource={setSource} nominate={nominate} />;
+    case allowedSources.fantasy_url.id:
+      return (
+        <RedditFantasySearch onClose={onClose} dialogOpen={dialogOpen} setSource={setSource} nominate={nominate} />
+      );
+    case allowedSources.reddit_user.id:
+      return <RedditUserSearch onClose={onClose} dialogOpen={dialogOpen} setSource={setSource} nominate={nominate} />;
+    default:
+      return (
+        <Dialog onClose={onClose} aria-label="add nomination dialog" open={dialogOpen}>
+          <DialogTitle>Add Nomination Error</DialogTitle>
+          <DialogContent>
+            <Typography>The source {source} is not supported. Please select a different source.</Typography>
+          </DialogContent>
+        </Dialog>
+      );
+  }
 };
 
 export default AddNominationDialog;

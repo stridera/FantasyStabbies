@@ -11,7 +11,7 @@ class Work extends DBErrors(Model) {
   static get jsonSchema() {
     return {
       type: "object",
-      required: ["title", "source_url"],
+      required: ["title", "authors", "source_url"],
       properties: {
         id: { type: "integer" },
         google_book_id: { type: "string" },
@@ -23,8 +23,6 @@ class Work extends DBErrors(Model) {
         source_url: { type: "string" },
         image_url: { type: "string" },
         note: { type: "string" },
-        is_valid: { type: "string" },
-        approved_by: { type: "integer" },
       },
     };
   }

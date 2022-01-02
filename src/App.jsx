@@ -31,7 +31,9 @@ const App = () => {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <BaseRoutes />
+          <React.StrictMode>
+            <BaseRoutes />
+          </React.StrictMode>
         </BrowserRouter>
       </ThemeProvider>
     </Provider>
