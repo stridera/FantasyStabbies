@@ -41,11 +41,11 @@ const workSchema = yup.object().shape({
   source: yup.string().required().min(3).max(255),
   title: yup.string().required().min(3).max(255),
   authors: yup.string().required().min(3).max(255),
-  publisher: yup.string().min(3).max(255),
-  published_date: yup.date(),
+  publisher: yup.string().max(255),
+  published_date: yup.string(),
   source_url: yup.string().url().required(),
   image_url: yup.string().url(),
-  note: yup.string().min(3).max(255),
+  note: yup.string().max(255),
 });
 
 const redditUserSchema = yup.object().shape({

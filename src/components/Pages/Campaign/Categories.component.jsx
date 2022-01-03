@@ -17,9 +17,8 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon } from "@material-ui/icons";
 
 import AddCategory from "../../dialogs/Category.dialog";
-import { deleteCategoryFromCampaign, getCategoriesForCampaign } from "../../../store/entities/categories.slice";
-import { getCampaignBySlug, getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
-import { getNominations } from "../../../services/api.service";
+import { deleteCategoryFromCampaign } from "../../../store/entities/categories.slice";
+import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -46,8 +45,7 @@ const CategoriesComponent = ({ setTitle, campaign, categories, setError }) => {
   const [status, setStatus] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
-  const deleteCategory = (id) => dispatch(deleteCategoryFromCampaign({ campagin_id: campaign.id, category_id: id }));
-  const editCategory = (id) => dispatch(editCategoryFromCampaign(campaign.id, id));
+  const deleteCategory = (id) => dispatch(deleteCategoryFromCampaign({ campaign_id: campaign.id, category_id: id }));
 
   useEffect(() => {
     const { status, message } = getCampaignStatus(campaign);
@@ -86,9 +84,9 @@ const CategoriesComponent = ({ setTitle, campaign, categories, setError }) => {
                   )}
                   {auth.isModerator && (
                     <Box className={classes.modActions}>
-                      <IconButton aria-label="edit category" onClick={() => editCategory(category.id)}>
+                      {/* <IconButton aria-label="edit category" onClick={() => editCategory(category.id)}>
                         <EditIcon />
-                      </IconButton>
+                      </IconButton> */}
                       <IconButton aria-label="delete category" onClick={() => deleteCategory(category.id)}>
                         <DeleteIcon />
                       </IconButton>

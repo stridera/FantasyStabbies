@@ -74,6 +74,7 @@ const GoogleBooksSearch = ({ onClose, dialogOpen, nominate }) => {
           label="Search"
           variant="outlined"
           fullWidth
+          autoFocus
           helperText={source.helperText}
           onChange={doSearch}
         />
