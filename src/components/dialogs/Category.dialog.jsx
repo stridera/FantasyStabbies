@@ -24,7 +24,7 @@ import allowedSources from "../../config/allowedSources";
 import { createCategoryForCampaign } from "../../store/entities/categories.slice";
 import { categorySchema } from "../../config/validation.schema";
 
-const CategoryDialog = ({ campaign, open, onClose }) => {
+const CategoryDialog = ({ campaign_id, open, onClose }) => {
   const useStyles = makeStyles((theme) => ({
     form: {
       width: "100%", // Fix IE 11 issue.
@@ -52,7 +52,7 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
 
   const onSubmit = (form) => {
     setSubmitted(true);
-    const data = { campagin_id: campaign, ...form };
+    const data = { campaign_id: campaign_id, ...form };
     console.log("Submitting", data);
     dispatch(createCategoryForCampaign(data)).then((data) => {
       console.log("Request complete.", data);
@@ -158,7 +158,7 @@ const CategoryDialog = ({ campaign, open, onClose }) => {
   );
 };
 
-const CategoryDialogHelper = ({ campaign, values }) => {
+const CategoryDialogHelper = ({ campaign_id, values }) => {
   const useStyles = makeStyles((theme) => ({
     form: {
       width: "100%", // Fix IE 11 issue.
@@ -191,7 +191,7 @@ const CategoryDialogHelper = ({ campaign, values }) => {
       <Fab color="secondary" aria-label="Add Category" className={classes.addCategoryFab} onClick={handleClickOpen}>
         <AddIcon />
       </Fab>
-      <CategoryDialog campaign={campaign} open={open} onClose={handleClose} values={values} />
+      <CategoryDialog campaign_id={campaign_id} open={open} onClose={handleClose} values={values} />
     </>
   );
 };

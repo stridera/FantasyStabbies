@@ -107,7 +107,7 @@ const CategoriesComponent = ({ setTitle, campaign, categories, setError }) => {
         </Box>
       )}
 
-      {auth.isModerator && campaign && <AddCategory campaign={campaign.id} />}
+      {auth.isModerator && campaign && <AddCategory campaign_id={campaign.id} />}
     </>
   );
 };
