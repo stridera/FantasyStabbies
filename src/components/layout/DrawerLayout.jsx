@@ -160,12 +160,12 @@ const ResponsiveDrawer = ({ title, campaigns, children }, ...rest) => {
       </List>
       <Divider />
       <List subheader={<ListSubheader>User</ListSubheader>} className={classes.toolbar_bottom}>
-        <ListItem button component={Link} to="/profile" key="profile" selected={title === "Profile"}>
+        {/* <ListItem button component={Link} to="/profile" key="profile" selected={title === "Profile"}>
           <ListItemIcon>
             <AccountCircle />
           </ListItemIcon>
           <ListItemText primary="Profile" />
-        </ListItem>
+        </ListItem> */}
         <ListItem
           button
           key="logout"

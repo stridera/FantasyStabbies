@@ -63,17 +63,15 @@ const BaseRoutes = () => {
       />
 
       {/* Profile */}
-      {/* <Route
+      <Route
         exact
         path="/profile"
         element={
           <PrivateOutlet>
-            <Drawer>
-              <Profile title={title} setTitle={setTitle} />
-            </Drawer>
+            <Profile title={title} setTitle={setTitle} />
           </PrivateOutlet>
         }
-      /> */}
+      />
 
       {/* Fallthrough */}
       <Route path="*" element={<NotFound />} />
