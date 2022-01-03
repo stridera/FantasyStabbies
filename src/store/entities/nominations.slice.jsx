@@ -115,7 +115,7 @@ const nominationsSlice = createSlice({
     [deleteNominationFromCategory.fulfilled]: (state, action) => {
       const { request_id } = action.meta;
       if (state.loading && state.currentRequestId === request_id) {
-        const index = state.entities.findIndex((nomination) => nomination.id === action.meta.arg.nomination.id);
+        const index = state.entities.findIndex((nomination) => nomination.id === action.meta.arg.nominationId);
         if (index !== -1) state.entities.splice(index, 1);
         state.loading = false;
         state.currentRequestId = undefined;

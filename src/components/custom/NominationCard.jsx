@@ -55,7 +55,7 @@ const NominationCard = ({ nomination, actions }) => {
             {nomination.authors}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            {nomination.publisher.split(" ")[0]}
+            {nomination.publisher?.split(" ")[0]}
           </Typography>
           {nomination.published_date && (
             <Typography variant="body2" color="textSecondary" component="p">

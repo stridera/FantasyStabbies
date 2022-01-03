@@ -4,17 +4,30 @@ const { ensureModerator, ensureAccountOldEnough } = require("../../middleware/au
 const Work = require("../../models/work.model");
 const { workSchema } = require("../../../src/config/validation.schema");
 const GoogleBooksService = require("../../services/googlebooks");
+const allowedSources = require("../../../src/config/allowedSources");
 
-router.get("/:id", async (req, res, next) => {
-  try {
-    const work = await Work.query().findOne({ google_book_id: req.params.id });
-    return res.json(work);
-  } catch (err) {
-    return next(err);
-  }
-});
+const saveWork = async (res, next, work) => {
+  workSchema
+    .validate(work)
+    .then(async (data) => {
+      Work.query()
+        .insert(data)
+        .then(async (work) => {
+          return res.status(201).json(work);
+        })
+        .catch(async (err) => {
+          if (err instanceof UniqueViolationError) {
+            return res.status(400).json({ error: "Work already exists." });
+          }
+          return next(err);
+        });
+    })
+    .catch((err) => {
+      return next({ status: 400, message: err.message });
+    });
+};
 
-router.post("/google_books", async (req, res, next) => {
+router.post(`/${allowedSources.google_books.id}`, async (req, res, next) => {
   try {
     const google_book_id = req.body.google_book_id;
 
@@ -34,36 +47,44 @@ router.post("/google_books", async (req, res, next) => {
       return next({ status: 400, message: "Google book not found." });
     }
 
-    Work.query()
-      .insert(data)
-      .then((work) => {
-        return res.status(201).json(work);
-      });
+    saveWork(res, next, data);
   } catch (err) {
     return next(err);
   }
 });
 
-router.post("/manual", async (req, res, next) => {
+router.post(`/${allowedSources.reddit_user.id}`, async (req, res, next) => {
   try {
-    workSchema
-      .validate(req.body)
-      .then(async (data) => {
-        Work.query()
-          .insert(data)
-          .then(async (work) => {
-            return res.status(201).json(work);
-          })
-          .catch(async (err) => {
-            if (err instanceof UniqueViolationError) {
-              return res.status(400).json({ error: "Work already exists." });
-            }
-            return next(err);
-          });
-      })
-      .catch((err) => {
-        return next({ status: 400, message: err.message });
-      });
+    const { body } = req;
+
+    if (!body.source_url.startsWith(allowedSources.reddit_user.url)) {
+      return res.status(400).json({ message: "Invalid source_url" });
+    }
+
+    saveWork(res, next, body);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.post(`/${allowedSources.fantasy_url.id}`, async (req, res, next) => {
+  try {
+    const { body } = req;
+
+    if (!body.source_url.startsWith(allowedSources.fantasy_url.url)) {
+      return res.status(400).json({ message: "Invalid source_url" });
+    }
+
+    saveWork(res, next, body);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.post(`/${allowedSources.manual.id}`, async (req, res, next) => {
+  try {
+    const { body } = req;
+    saveWork(res, next, body);
   } catch (err) {
     return next(err);
   }

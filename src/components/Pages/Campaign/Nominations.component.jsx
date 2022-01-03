@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCampaignStatus, statusStates } from "../../../store/entities/campaigns.slice";
 import {
   getNominationsForCategory,
+  deleteNominationFromCategory,
   removeVoteForNomination,
   voteForNomination,
 } from "../../../store/entities/nominations.slice";
@@ -77,7 +78,7 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
   }, [updateNominations]);
 
   const deleteNomination = (nomination) => {
-    dispatch(deleteNomination(nomination.id)).then((data) => {
+    dispatch(deleteNominationFromCategory({ category, nominationId: nomination.id })).then((data) => {
       if (data.error) {
         if (data.error.message === "Request failed with code 403") {
           dispatch(logout());
@@ -133,7 +134,7 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
             {/* <IconButton aria-label="edit nomination" onClick={() => editNomination(nominationId)}>
             <EditIcon />
           </IconButton> */}
-            <IconButton aria-label="delete nomination" onClick={() => deleteNomination(nomination.id)}>
+            <IconButton aria-label="delete nomination" onClick={() => deleteNomination(nomination)}>
               <DeleteIcon />
             </IconButton>
           </Box>

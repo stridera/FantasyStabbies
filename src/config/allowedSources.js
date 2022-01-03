@@ -3,16 +3,16 @@ const allowedSources = {
   reddit_user: {
     id: "reddit_user",
     text: "Reddit /u/User URL",
-    helperText: "https://www.reddit.com/u/",
-    validation: "reddit_user",
+    helperText: "Reddit Username",
+    url: "https://www.reddit.com/user/",
     regexp: /^(?:(?:https?):\/\/)?(?:www\.)?(?:reddit\.com)?(?:\/u(?:ser)?\/)?([a-z0-9]+)$/,
   },
   fantasy_url: {
     id: "fantasy_url",
     text: "/r/Fantasy URL",
-    helperText: "https://www.reddit.com/r/",
+    helperText: "https://www.reddit.com/r/ URL",
+    url: "https://www.reddit.com/r/Fantasy",
     regexp: /^(?:(?:https?):\/\/)?(?:www\.)?(?:reddit\.com)?(?:\/r\/)?(.+)$/,
-    validation: "fantasy_url",
   },
   manual: { id: "manual", text: "Manual Entry" },
 };

@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   campaignBox: {
     backgroundColor: "#fff",
     marginBottom: theme.spacing(2),
+    padding: theme.spacing(4),
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -35,7 +36,7 @@ const Dashboard = ({ campaigns, setTitle }) => {
           <Typography variant="h5" align="center">
             {getCampaignStatus(campaign).message}
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <Grid item xs={12} sm={6}>
               <p>Nominations Begin: {campaign.nominate_start_date}</p>
             </Grid>
