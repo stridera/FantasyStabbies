@@ -28,6 +28,7 @@ const NominationCard = ({ nomination, actions }) => {
     cover: {
       width: 151,
       height: 200,
+      padding: theme.spacing(2),
     },
     invalid: {
       color: "#ff0000",

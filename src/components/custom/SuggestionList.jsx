@@ -20,7 +20,7 @@ const SuggestionsList = ({ suggestions, actions }) => {
     <Grid container spacing={2} className={classes.container}>
       {suggestions &&
         suggestions.map((suggestion) => (
-          <Grid item md={3}>
+          <Grid item sm={12} md={6} lg={3}>
             <NominationCard nomination={suggestion} actions={actions} />
           </Grid>
         ))}
