@@ -158,8 +158,8 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
         </Typography>
       </Box>
       <Grid container spacing={2}>
-        <Grid item lg={4}>
-          {(auth.isModerator || status === statusStates.nominating) && (
+        {(auth.isModerator || status === statusStates.nominating) && (
+          <Grid item lg={4}>
             <Card className={classes.card}>
               <CardActionArea>
                 <CardContent className={classes.cardContent}>
@@ -177,8 +177,8 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
                 </Button>
               </CardActions>
             </Card>
-          )}
-        </Grid>
+          </Grid>
+        )}
         {nominations &&
           nominations.map((nomination) => (
             <Grid item sm={12} md={6} lg={4} key={nomination.id}>
