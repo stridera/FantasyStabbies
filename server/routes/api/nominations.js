@@ -37,6 +37,7 @@ router.get("/", async (req, res, next) => {
       .where("category_id", req.category.id)
       .select(
         "nomination.id",
+        "nomination.category_id",
         "work.* as work",
         Vote.query()
           .where("nomination_id", ref("nomination.id"))
@@ -89,7 +90,22 @@ router.post("/", ensureAccountOldEnough, ensureWeAreInTheNominationPhase, async 
             ...extra,
           })
           .then(async (nomination) => {
-            return res.status(201).json(nomination);
+            const inserted = await Nomination.query()
+              .where("nomination.id", nomination.id)
+              .select(
+                "nomination.id",
+                "nomination.category_id",
+                "work.* as work",
+                Vote.query()
+                  .where("nomination_id", ref("nomination.id"))
+                  .where("user_id", ref("nomination.user_id"))
+                  .count()
+                  .castTo(boolean)
+                  .as("voted")
+              )
+              .joinRelated("work")
+              .first();
+            return res.status(201).json(inserted);
           })
           .catch((err) => {
             if (err instanceof UniqueViolationError) {

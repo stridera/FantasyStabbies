@@ -49,7 +49,6 @@ export const removeVoteForNomination = createAsyncThunk("nominations/unvote", as
 const nominationsSlice = createSlice({
   name: "nominations",
   initialState: {
-    campagin_id: null,
     category_id: null,
     entities: [],
     loading: false,
@@ -68,7 +67,6 @@ const nominationsSlice = createSlice({
     [getNominationsForCategory.fulfilled]: (state, action) => {
       const { request_id } = action.meta;
       if (state.loading && state.currentRequestId === request_id) {
-        state.campagin_id = action.payload.campagin_id;
         state.category_id = action.payload.category_id;
         state.entities = action.payload.data.map((entity) => {
           entity.voted = entity.voted === "1" ? true : false;
@@ -97,9 +95,8 @@ const nominationsSlice = createSlice({
     },
     [createNominationInCategory.fulfilled]: (state, action) => {
       const { payload } = action;
-      state.campagin_id = payload.campagin_id;
       state.category_id = payload.category_id;
-      state.entities.push(payload.data);
+      state.entities.push(payload);
       state.lastUpdate = new moment().format();
       state.loading = false;
     },
@@ -161,7 +158,6 @@ const nominationsSlice = createSlice({
       const { request_id } = action.meta;
       if (state.loading && state.currentRequestId === request_id) {
         const index = state.entities.findIndex((nomination) => nomination.id === action.meta.arg.nomination.id);
-        console.log(state.entities, index);
         state.entities[index].voted = false;
         state.loading = false;
         state.currentRequestId = undefined;

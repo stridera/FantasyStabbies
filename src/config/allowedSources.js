@@ -1,5 +1,5 @@
 const allowedSources = {
-  google_books: { id: "google_books", text: "Google Books", helperText: "Search for books by Title or Author." },
+  google_books: { id: "google_books", text: "Google Books", helperText: "Search for books by Title." },
   reddit_user: {
     id: "reddit_user",
     text: "Reddit /u/User URL",
