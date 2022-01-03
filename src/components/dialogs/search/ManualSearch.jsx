@@ -1,5 +1,5 @@
 import React from "react";
-import { DialogTitle, DialogContent, Grid, Typography, TextField, Button } from "@material-ui/core";
+import { Dialog, DialogTitle, DialogContent, Grid, Typography, TextField, Button } from "@material-ui/core";
 import { manual as source } from "../../../config/allowedSources";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";

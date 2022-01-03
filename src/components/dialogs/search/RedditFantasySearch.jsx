@@ -17,12 +17,6 @@ const RedditFantasySearch = () => {
     });
   };
 
-  useEffect(() => {
-    if (inputValue.length > 2) {
-      doSearch(inputValue);
-    }
-  }, [inputValue]);
-
   return <></>;
 };
 
