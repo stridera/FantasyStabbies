@@ -95,10 +95,6 @@ const CampaignDialog = ({ open, onClose }) => {
     setError("");
   };
 
-  // useEffect(() => {
-  //   console.log(errors);
-  // }, [errors]);
-
   return (
     <Dialog onClose={handleClose} aria-labelledby="-dialog-title" open={open}>
       <DialogTitle id="-dialog-title">Create New Campaign</DialogTitle>

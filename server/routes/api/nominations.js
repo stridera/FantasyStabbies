@@ -18,8 +18,6 @@ const ensureWeAreInTheNominationPhase = async (req, res, next) => {
   const end = campaign.nominate_end_date;
   const now = new Date();
 
-  // console.log(campaign.name, start, end, now);
-
   if (now < start) {
     return res.status(400).json({ error: "Nomination phase has not started yet." });
   } else if (now > end) {

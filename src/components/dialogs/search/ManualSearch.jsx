@@ -25,10 +25,6 @@ const ManualSearch = ({ onClose, dialogOpen, nominate }) => {
     resolver: yupResolver(workSchema),
   });
 
-  useEffect(() => {
-    console.log("Errors", errors);
-  }, [errors]);
-
   const onSubmit = (data) => {
     nominate({ source: source.id, ...data });
   };

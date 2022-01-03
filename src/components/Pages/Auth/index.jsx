@@ -10,7 +10,6 @@ export const AfterAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Checking auth.", auth.isAuthenticated);
     if (auth.isAuthenticated) {
       auth.isModerator ? navigate("/mod") : navigate("/campaign");
     }

@@ -53,9 +53,7 @@ const CategoryDialog = ({ campaign_id, open, onClose }) => {
   const onSubmit = (form) => {
     setSubmitted(true);
     const data = { campaign_id: campaign_id, ...form };
-    console.log("Submitting", data);
     dispatch(createCategoryForCampaign(data)).then((data) => {
-      console.log("Request complete.", data);
       setSubmitted(false);
     });
   };
@@ -177,12 +175,10 @@ const CategoryDialogHelper = ({ campaign_id, values }) => {
 
   const handleClickOpen = () => {
     setOpen(true);
-    console.log("Opening!");
   };
 
   const handleClose = () => {
     setOpen(false);
-    console.log("Closing!");
   };
 
   const classes = useStyles();

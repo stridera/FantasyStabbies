@@ -48,10 +48,8 @@ const Auth = () => {
     if (auth.isAuthenticated) {
       const from = location.state?.from?.pathname;
       if (from) {
-        console.log("from", from);
         navigate(location.state.from.pathname);
       } else {
-        console.log("logged in");
         auth.isModerator ? navigate("/mod") : navigate("/campaign");
       }
     }

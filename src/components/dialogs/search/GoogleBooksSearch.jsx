@@ -50,7 +50,6 @@ const GoogleBooksSearch = ({ onClose, dialogOpen, nominate }) => {
 
   const actions = (nominate) => {
     const nominateor = (nomination) => {
-      console.log("Nominating", nomination);
       return (
         <Button
           size="small"

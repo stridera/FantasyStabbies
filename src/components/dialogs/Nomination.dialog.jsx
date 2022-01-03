@@ -37,7 +37,7 @@ const AddNominationDialog = ({ category, dialogOpen, onClose }) => {
           });
       })
       .catch((err) => {
-        console.log(err);
+        console.log("Error creating work", err);
       });
   };
 

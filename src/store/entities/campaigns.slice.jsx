@@ -11,7 +11,6 @@ export const statusStates = {
 };
 
 export const getCampaigns = createAsyncThunk("campaigns/fetch", async () => {
-  console.log("fetching campaigns");
   const { data } = await campaignsService.getCampaigns();
   return data;
 });
