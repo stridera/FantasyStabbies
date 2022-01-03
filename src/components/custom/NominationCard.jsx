@@ -16,19 +16,22 @@ const NominationCard = ({ nomination, actions }) => {
   const useStyles = makeStyles((theme) => ({
     card: {
       display: "flex",
-      width: 345,
+      width: 310,
     },
     details: {
       display: "flex",
       flexDirection: "column",
+      width: 131,
     },
     content: {
       flex: "1 0 auto",
+      paddingRight: 0,
     },
     cover: {
       width: 151,
       height: 200,
       padding: theme.spacing(2),
+      paddingRight: 0,
     },
     invalid: {
       color: "#ff0000",
@@ -41,17 +44,17 @@ const NominationCard = ({ nomination, actions }) => {
     <Card key={nomination.id} className={classes.card}>
       <Box className={classes.details}>
         <CardContent className={classes.content}>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             {nomination.title}
           </Typography>
-          <Typography variant="h6" color="textSecondary" component="h6">
+          <Typography variant="subtitle2" color="textSecondary" gutterBottom>
             {nomination.authors}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            Publisher: {nomination.publisher}
+            {nomination.publisher.split(" ")[0]}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            Date: {nomination.published_date} {nomination.published_date?.split("-")[0] !== "2021" && <WarningIcon />}
+            {nomination.published_date} {nomination.published_date?.split("-")[0] !== "2021" && <WarningIcon />}
           </Typography>
         </CardContent>
         <CardActions>{actions(nomination)}</CardActions>

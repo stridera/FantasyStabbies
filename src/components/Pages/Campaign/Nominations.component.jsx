@@ -158,7 +158,7 @@ const NominationComponent = ({ campaign, category, setTitle, setError }) => {
         </Typography>
       </Box>
       <Grid container spacing={2}>
-        <Grid item lg={6}>
+        <Grid item lg={4}>
           {(auth.isModerator || status === statusStates.nominating) && (
             <Card className={classes.card}>
               <CardActionArea>
