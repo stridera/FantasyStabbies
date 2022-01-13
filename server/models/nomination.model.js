@@ -2,7 +2,6 @@ const { Model } = require("objection");
 const { DBErrors } = require("objection-db-errors");
 
 const tableNames = require("../db/tableNames");
-const Vote = require("./vote.model");
 
 class Nomination extends DBErrors(Model) {
   static get tableName() {
@@ -25,6 +24,26 @@ class Nomination extends DBErrors(Model) {
   }
   static get relationMappings() {
     return {
+      campaign: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require("./campaign.model"),
+        join: {
+          from: `${tableNames.nomination}.category_id`,
+          through: {
+            from: `${tableNames.category}.id`,
+            to: `${tableNames.category}.campaign_id`,
+          },
+          to: `${tableNames.campaign}.id`,
+        },
+      },
+      category: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require("./category.model"),
+        join: {
+          from: `${tableNames.nomination}.category_id`,
+          to: `${tableNames.category}.id`,
+        },
+      },
       user: {
         relation: Model.BelongsToOneRelation,
         modelClass: require("./user.model"),
@@ -41,12 +60,20 @@ class Nomination extends DBErrors(Model) {
           to: `${tableNames.work}.id`,
         },
       },
+      approved_by: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require("./user.model"),
+        join: {
+          from: `${tableNames.nomination}.approved_by`,
+          to: `${tableNames.user}.id`,
+        },
+      },
       votes: {
         relation: Model.ManyToManyRelation,
-        modelClass: Vote,
+        modelClass: require("./vote.model"),
         join: {
           from: `${tableNames.nomination}.id`,
-          to: `${tableNames.vote}.nomination`,
+          to: `${tableNames.vote}.nomination_id`,
         },
       },
     };

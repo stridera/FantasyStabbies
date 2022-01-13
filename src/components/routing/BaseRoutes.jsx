@@ -40,10 +40,13 @@ const BaseRoutes = () => {
 
       {/* Moderators */}
       <Route
-        path="/mod"
+        path="/mod/*"
         element={
           <ModeratorOutlet>
-            <Mod title={title} setTitle={setTitle} />
+            <Routes>
+              <Route path=":slug" element={<Mod title={title} setTitle={setTitle} />} />
+              <Route index element={<Mod title={title} setTitle={setTitle} />} />
+            </Routes>
           </ModeratorOutlet>
         }
       />

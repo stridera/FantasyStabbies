@@ -6,12 +6,13 @@ const addDevUser = async (req) => {
     const is_moderator = req.headers["x-is-moderator"] == "true";
     const reddit_id = `dev_${is_moderator ? "moderator" : "user"}`;
     const data = {
-      id: parseInt(req.headers["x-user-id"]) || 10001,
       username: reddit_id,
       reddit_id: reddit_id,
       is_moderator: is_moderator,
       reddit_created: req.headers["x-reddit-created"] || "2020-08-11T16:30:38.564Z",
     };
+
+    if (req.headers["x-user-id"]) data["id"] = parseInt(req.headers["x-user-id"]);
 
     if (process.env.ENV == "dev") {
       req.user = await User.query().where("reddit_id", reddit_id).first();

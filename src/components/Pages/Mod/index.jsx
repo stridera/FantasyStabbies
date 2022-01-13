@@ -1,2 +1,2 @@
-import ModComponent from "./mod.component";
+import ModComponent from "./dashboard.component";
 export default ModComponent;

@@ -35,5 +35,18 @@ class Campaign extends DBErrors(Model) {
       },
     };
   }
+
+  static get relationMappings() {
+    return {
+      categories: {
+        relation: Model.HasManyRelation,
+        modelClass: require("./nomination.model"),
+        join: {
+          from: `${tableNames.campaign}.id`,
+          to: `${tableNames.nomination}.campaign`,
+        },
+      },
+    };
+  }
 }
 module.exports = Campaign;
